@@ -58,7 +58,9 @@ class Bot {
     Node *root;
     TankGame::TankField state;
 
-    Bot(const TankGame::TankField &s, const int &r) : state(s), role(r) {}
+    Bot(const TankGame::TankField &s, const int &r) : role(r), state(s) {
+        root = new Node(-1);
+    }
 
     ~Bot() { delete root; }
 

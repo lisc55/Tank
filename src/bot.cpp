@@ -37,7 +37,7 @@ inline bool Bot::IsFullyExpanded(Node *p) {
     for (int i = 0; i < 9; i++)
         for (int j = 0; j < 9; j++)
             if (state.ActionIsValid(turn, 0, TankGame::Action(i - 1)) &&
-                state.ActionIsValid(turn, 1, TankGame::Action(i - 1)) &&
+                state.ActionIsValid(turn, 1, TankGame::Action(j - 1)) &&
                 !p->ch.count(Policy(i, j)))
                 return p->full = false;
     return p->full = true;
@@ -53,16 +53,18 @@ inline void Bot::Move(int pol) {
 
 inline Node *Bot::RandomMove(Node *p) {
     if (IsFullyExpanded(p)) return nullptr;
-    while (true) {
-        auto act1 = (TankGame::Action)RandBetween(TankGame::Stay,
-                                                  TankGame::LeftShoot + 1);
-        auto act2 = (TankGame::Action)RandBetween(TankGame::Stay,
-                                                  TankGame::LeftShoot + 1);
-        if (state.ActionIsValid(state.mySide, 0, act1) &&
-            state.ActionIsValid(state.mySide, 1, act2) &&
-            !p->ch.count(Policy(act1 - 1, act2 - 1)))
-            return p->NewChild(Policy(act1 - 1, act2 - 1));
-    }
+    int l1[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8},
+        l2[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    std::random_shuffle(l1, l1 + 9);
+    std::random_shuffle(l2, l2 + 9);
+    int turn = (p->dep & 1) == role;
+    for (auto act1 : l1)
+        for (auto act2 : l2)
+            if (state.ActionIsValid(turn, 0, TankGame::Action(act1 - 1)) &&
+                state.ActionIsValid(turn, 1, TankGame::Action(act2 - 1)) &&
+                !p->ch.count(Policy(act1, act2)))
+                return p->NewChild(Policy(act1, act2));
+    return nullptr;
 }
 
 inline void Bot::BackPropagation(Node *p, double eval) {
@@ -106,7 +108,7 @@ inline bool Bot::UCTSearch() {
 }
 
 inline void Bot::Train() {
-    auto timing = clock() + int(0.95 * CLOCKS_PER_SEC);
+    unsigned long long timing = clock() + int(0.95 * CLOCKS_PER_SEC);
     while ((unsigned)clock() < timing) {
         for (int i = 0; i < TRAIN_UNIT; i++)
             if (!UCTSearch()) return;

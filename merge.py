@@ -3,7 +3,8 @@ import os
 import re
 
 src = ["json/json.h", "json/json-forwards.h", "json/jsoncpp.cpp",
-       "src/template.h", "src/template.cpp", "src/rule.h", "src/rule.cpp", "main.cpp"]
+       "src/template.h", "src/template.cpp", "src/rule.h", "src/rule.cpp", 
+       "src/bot.h", "src/bot.cpp", "main.cpp"]
 
 lines = []
 for filename in src:
@@ -30,6 +31,6 @@ with open(target, "r", encoding="utf-8") as f:
 
 with open(target, "w", encoding="utf-8") as f:
     for l in data:
-        if '#include "json.h"' not in l and '#include "src/bot.h"' not in l:
+        if '#include "json.h"' not in l:
             f.write(l)
     f.close()
