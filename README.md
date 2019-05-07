@@ -12,6 +12,8 @@
 
 ```src/json```: json头文件直接放到project里了.
 
+```src/bot```: Monte Carlo Tree Search的代码.
+
 ### 用法
 
 **新增的代码不要忘了加到CMAKE列表里去**!
