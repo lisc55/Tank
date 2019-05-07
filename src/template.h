@@ -1,7 +1,10 @@
+#include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <queue>
 #include <set>
 #include <stack>
