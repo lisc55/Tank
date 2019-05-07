@@ -30,6 +30,6 @@ with open(target, "r", encoding="utf-8") as f:
 
 with open(target, "w", encoding="utf-8") as f:
     for l in data:
-        if '#include "json.h"' not in l:
+        if '#include "json.h"' not in l and '#include "src/bot.h"' not in l:
             f.write(l)
     f.close()
