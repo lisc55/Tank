@@ -8,7 +8,7 @@ elif [ "$1" = "clean" ] ; then
 elif [ "$1" = "merge" ]; then
 	python3 merge.py
 elif [ "$1" = "format" ]; then
-	clang-format -style=file -i `find . -type f -regex ".*\.\(cpp\|h\)"`
+	clang-format -style=file -i json/*.h json/*.cpp src/*.cpp src/*.h *.cpp Amazons/*.cpp
 else
 	echo "NO SUCH CMD"
 fi
