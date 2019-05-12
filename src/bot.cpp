@@ -80,6 +80,7 @@ inline Node *Bot::RandomMove(Node *p) {
             }
         }
     }
+    return nullptr;
 }
 
 inline double Bot::Utility(TankGame::GameResult res) {

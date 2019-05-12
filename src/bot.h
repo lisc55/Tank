@@ -12,7 +12,7 @@ class Policy {
     Policy(int act_0, int act_1) : act_0(act_0), act_1(act_1) {}
 
     bool operator<(const Policy &rhs) const {
-        return act_0 < rhs.act_0 || act_0 == rhs.act_0 && act_1 < rhs.act_1;
+        return (act_0 < rhs.act_0) || (act_0 == rhs.act_0 && act_1 < rhs.act_1);
     }
 
     bool empty() const { return act_0 == -2; }

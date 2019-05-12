@@ -1341,7 +1341,6 @@ JSON_API std::ostream &operator<<(std::ostream &, const Value &root);
 
 #endif
 
-
 #ifndef JSON_FORWARD_AMALGATED_H_INCLUDED
 #define JSON_FORWARD_AMALGATED_H_INCLUDED
 
@@ -1453,8 +1452,6 @@ class ValueInternalMap;
 #endif
 
 #endif
-
-
 
 #ifndef LIB_JSONCPP_JSON_TOOL_H_INCLUDED
 #define LIB_JSONCPP_JSON_TOOL_H_INCLUDED
@@ -6031,7 +6028,7 @@ class Policy {
     Policy(int act_0, int act_1) : act_0(act_0), act_1(act_1) {}
 
     bool operator<(const Policy &rhs) const {
-        return act_0 < rhs.act_0 || act_0 == rhs.act_0 && act_1 < rhs.act_1;
+        return (act_0 < rhs.act_0) || (act_0 == rhs.act_0 && act_1 < rhs.act_1);
     }
 
     bool empty() const { return act_0 == -2; }
@@ -6190,6 +6187,7 @@ inline Node *Bot::RandomMove(Node *p) {
             }
         }
     }
+    return nullptr;
 }
 
 inline double Bot::Utility(TankGame::GameResult res) {
@@ -6306,7 +6304,6 @@ Policy Bot::Play() {
         return root->pol.second;
 }
 
-
 using namespace TankGame;
 
 int main() {
@@ -6318,4 +6315,3 @@ int main() {
     field->DebugPrint();
     SubmitAndExit(Action(decision.act_0), Action(decision.act_1));
 }
-
