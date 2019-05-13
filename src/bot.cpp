@@ -88,7 +88,7 @@ inline double Bot::Utility(TankGame::GameResult res) {
         return 1.0;
     else if (res == TankGame::Red)
         return 0.0;
-    else if (res == TankGame::Draw)
+    else
         return 0.5;
 }
 
@@ -182,17 +182,27 @@ inline void Bot::Train() {
 
 Policy Bot::Play() {
     Train();
-    Node *nxt = nullptr;
     if (root->ch.empty()) return Policy(-2, -2);
-    for (auto &p : root->ch) {
-        if (!nxt || p.second->vis > nxt->vis) nxt = p.second;
+    memset(vis, 0, sizeof vis);
+    bool flag = state.mySide == TankGame::Red;
+    if (flag) {
+        for (auto &p : root->ch) {
+            vis[p.first.second.act_0 + 1][p.first.second.act_1 + 1][0]++;
+        }
+    } else {
+        for (auto &p : root->ch) {
+            vis[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0]++;
+        }
     }
-    if (!nxt) return Policy(-2, -2);
-    root = nxt;
-    root->DelFather();
-    Move(root->pol);
-    if (state.mySide == TankGame::Blue)
-        return root->pol.first;
-    else if (state.mySide == TankGame::Red)
-        return root->pol.second;
+    int max = 0;
+    int act_0 = -1, act_1 = -1;
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            if (max < vis[i][j][0]) {
+                max = vis[i][j][0];
+                act_0 = i, act_1 = j;
+            }
+        }
+    }
+    return Policy(act_0 - 1, act_1 - 1);
 }
