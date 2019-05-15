@@ -119,10 +119,6 @@ inline void Bot::BackPropagation(Node *p, double utility) {
     }
 }
 
-// notice that the policy is in [-1,7], so we should +1 in the following
-double val[9][9][2];
-int vis[9][9][2];
-
 // Using Decoupled UCT
 inline void Bot::Update(Node *p) {
     memset(val, 0, sizeof val);
@@ -170,8 +166,6 @@ inline void Bot::Update(Node *p) {
     p->bstCh = p->ch[std::make_pair(polBlue, polRed)];
 }
 
-unsigned long long timing;
-
 inline void Bot::Train() {
     while ((unsigned)clock() < timing) {
         for (int i = 0; i < TRAIN_UNIT; i++) {
@@ -180,6 +174,7 @@ inline void Bot::Train() {
     }
 }
 
+// return mySide policy
 Policy Bot::Play() {
     Train();
     if (root->ch.empty()) return Policy(-2, -2);
@@ -205,4 +200,13 @@ Policy Bot::Play() {
         }
     }
     return Policy(act_0 - 1, act_1 - 1);
+}
+
+void Bot::Play(const std::pair<Policy, Policy> &pol) {
+    if (!root->ch.count(pol))
+        root = root->NewChild(pol);
+    else
+        root = root->ch[pol];
+    root->DelFather();
+    move(root->pol);
 }
