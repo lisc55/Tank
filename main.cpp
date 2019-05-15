@@ -6,7 +6,6 @@ using namespace TankGame;
 const double TIME_LIMIT = 0.95;
 
 int main() {
-    freopen("test.in", "r", stdin);
     srand((unsigned)time(nullptr));
     string data, globaldata;
     ReadInput(std::cin, data, globaldata);
