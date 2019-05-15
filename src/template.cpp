@@ -188,9 +188,9 @@ bool TankField::DoAction() {
         logs.push(log);
     }
 
-    // for (int side = 0; side < sideCount; side++)
-        // for (int tank = 0; tank < tankPerSide; tank++)
-            // nextAction[side][tank] = Invalid;
+    for (int side = 0; side < sideCount; side++)
+        for (int tank = 0; tank < tankPerSide; tank++)
+            nextAction[side][tank] = Invalid;
 
     currentTurn++;
     return true;

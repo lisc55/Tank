@@ -73,27 +73,27 @@ class Bot {
     }
     ~Bot() { delete root; }
 
-    inline void SetTime(double period){
+    void SetTime(double period) {
         timing = clock() + int(period * CLOCKS_PER_SEC);
     }
 
-    inline void Update(Node *);
+    void Update(Node *);
 
-    inline bool IsFullyExpanded(Node *);
+    bool IsFullyExpanded(Node *);
 
-    inline void Move(const std::pair<Policy, Policy> &);
+    void Move(const std::pair<Policy, Policy> &);
 
-    inline Node *RandomMove(Node *);
+    Node *RandomMove(Node *);
 
-    inline double Utility(TankGame::GameResult);
+    double Utility(TankGame::GameResult);
 
-    inline void BackPropagation(Node *, double);
+    void BackPropagation(Node *, double);
 
-    inline void RollOut(Node *);
+    void RollOut(Node *);
 
-    inline bool UCTSearch();
+    bool UCTSearch();
 
-    inline void Train();
+    void Train();
 
     Policy Play();
 

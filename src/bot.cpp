@@ -97,8 +97,8 @@ inline void Bot::RollOut(Node *p) {
     Node *ch;
     for (Node *t = p;; t = ch, Move(t->pol)) {
         ch = RandomMove(t);
-        if (t->ch.empty()) {
-            TankGame::GameResult res = state.GetGameResult();
+        TankGame::GameResult res = state.GetGameResult();
+        if (res != TankGame::NotFinished) {
             if (!p->ch.empty()) {
                 delete p->ch.begin()->second;
                 p->full = 0;
