@@ -3,13 +3,12 @@
 
 using namespace TankGame;
 
-const double TIME_LIMIT = 0.95;
+const double TIME_LIMIT = 0.80;
 
 int main() {
 #ifndef _BOTZONE_ONLINE
     freopen("in", "r", stdin);
 #endif
-    srand((unsigned)time(nullptr));
     string data, globaldata;
     ReadInput(std::cin, data, globaldata);
     Bot bot(*field);

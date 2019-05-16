@@ -65,10 +65,10 @@ int shuffled_list3[] = {-1, 0, 1, 2, 3, 4, 5, 6, 7};
 
 Node *Bot::RandomMove(Node *p) {
     if (IsFullyExpanded(p)) return nullptr;
-    std::random_shuffle(shuffled_list0, shuffled_list0 + 9);
-    std::random_shuffle(shuffled_list1, shuffled_list1 + 9);
-    std::random_shuffle(shuffled_list2, shuffled_list2 + 9);
-    std::random_shuffle(shuffled_list3, shuffled_list3 + 9);
+    std::shuffle(shuffled_list0, shuffled_list0 + 9, rng);
+    std::shuffle(shuffled_list1, shuffled_list1 + 9, rng);
+    std::shuffle(shuffled_list2, shuffled_list2 + 9, rng);
+    std::shuffle(shuffled_list3, shuffled_list3 + 9, rng);
     for (auto actBlue0 : shuffled_list0) {
         for (auto actBlue1 : shuffled_list1) {
             for (auto actRed0 : shuffled_list2) {
@@ -194,7 +194,7 @@ int Bot::Train() {
 // return mySide policy
 Policy Bot::GenDecision() {
     int res = Train();
-    printf("%d\n", res);
+    // printf("%d\n", res);
     if (root->ch.empty()) return Policy(-2, -2);
     memset(vis, 0, sizeof vis);
     bool flag = state.mySide == TankGame::Red;

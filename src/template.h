@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <random>
 #include "../json/json.h"
 
 #ifndef TANK_TEMPLATE_H
