@@ -329,21 +329,21 @@ void TankField::DebugPrint() {
         }
         cout << endl;
     }
-    cout << "blue distance:" << endl;
-    for (int i = 0; i < fieldHeight; i++) {
-        for (int j = 0; j < fieldWidth; j++) {
-            cout << std::setw(2) << distance[0][i][j] << ' ';
-        }
-        cout << endl;
-    }
-    cout << endl;
-    cout << "red distance:" << endl;
-    for (int i = 0; i < fieldHeight; i++) {
-        for (int j = 0; j < fieldWidth; j++) {
-            cout << std::setw(2) << distance[1][i][j] << ' ';
-        }
-        cout << endl;
-    }
+    // cout << "blue distance:" << endl;
+    // for (int i = 0; i < fieldHeight; i++) {
+    //     for (int j = 0; j < fieldWidth; j++) {
+    //         cout << std::setw(2) << distance[0][i][j] << ' ';
+    //     }
+    //     cout << endl;
+    // }
+    // cout << endl;
+    // cout << "red distance:" << endl;
+    // for (int i = 0; i < fieldHeight; i++) {
+    //     for (int j = 0; j < fieldWidth; j++) {
+    //         cout << std::setw(2) << distance[1][i][j] << ' ';
+    //     }
+    //     cout << endl;
+    // }
     cout << slimHR << endl;
     for (int side = 0; side < sideCount; side++) {
         cout << side2String[side] << ": base" << ' '

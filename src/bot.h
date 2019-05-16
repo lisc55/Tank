@@ -91,9 +91,9 @@ class Bot {
 
     void RollOut(Node *);
 
-    bool UCTSearch();
+    bool MCTS();
 
-    void Train();
+    int Train();
 
     Policy Play();
 

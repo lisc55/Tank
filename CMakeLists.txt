@@ -7,5 +7,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../)
 
 set(CMAKE_BUILD_TYPE "Debug")
 
-add_executable(Tank main.cpp src/template.h src/template.cpp src/rule.h src/rule.cpp
+add_executable(Tank main.cpp src/template.h src/template.cpp
         json/json.h json/jsoncpp.cpp src/bot.h src/bot.cpp)

@@ -1,6 +1,15 @@
 #include "bot.h"
 
-inline bool Bot::UCTSearch() {
+void Print(Node *p) {
+    for (auto i : p->ch) {
+        printf("((%d, %d), (%d, %d)) %p\n", i.first.first.act_0,
+               i.first.first.act_1, i.first.second.act_0, i.first.second.act_1,
+               i.second);
+    }
+    puts("");
+}
+
+bool Bot::MCTS() {
     TankGame::TankField copy = state;
     Node *p = root;
     for (; p; p = p->bstCh) {
@@ -15,16 +24,17 @@ inline bool Bot::UCTSearch() {
     return 1;
 }
 
-inline void Bot::Move(const std::pair<Policy, Policy> &pol) {
+void Bot::Move(const std::pair<Policy, Policy> &pol) {
     if (pol.first.empty() && pol.first.empty()) return;
     state.nextAction[TankGame::Blue][0] = TankGame::Action(pol.first.act_0),
-    state.nextAction[TankGame::Blue][1] = TankGame::Action(pol.second.act_1);
-    state.nextAction[TankGame::Red][0] = TankGame::Action(pol.first.act_0);
-    state.nextAction[TankGame::Red][1] = TankGame::Action(pol.first.act_1);
+    state.nextAction[TankGame::Blue][1] = TankGame::Action(pol.first.act_1);
+    state.nextAction[TankGame::Red][0] = TankGame::Action(pol.second.act_0);
+    state.nextAction[TankGame::Red][1] = TankGame::Action(pol.second.act_1);
     state.DoAction();
+    // state.DebugPrint();
 }
 
-inline bool Bot::IsFullyExpanded(Node *p) {
+bool Bot::IsFullyExpanded(Node *p) {
     if (p->full) return 1;
     for (int actBlue0 = -1; actBlue0 < 8; actBlue0++) {
         for (int actBlue1 = -1; actBlue1 < 8; actBlue1++) {
@@ -53,7 +63,7 @@ int shuffled_list1[] = {-1, 0, 1, 2, 3, 4, 5, 6, 7};
 int shuffled_list2[] = {-1, 0, 1, 2, 3, 4, 5, 6, 7};
 int shuffled_list3[] = {-1, 0, 1, 2, 3, 4, 5, 6, 7};
 
-inline Node *Bot::RandomMove(Node *p) {
+Node *Bot::RandomMove(Node *p) {
     if (IsFullyExpanded(p)) return nullptr;
     std::random_shuffle(shuffled_list0, shuffled_list0 + 9);
     std::random_shuffle(shuffled_list1, shuffled_list1 + 9);
@@ -65,7 +75,7 @@ inline Node *Bot::RandomMove(Node *p) {
                 for (auto actRed1 : shuffled_list3) {
                     if (state.ActionIsValid(TankGame::Blue, 0,
                                             TankGame::Action(actBlue0)) &&
-                        state.ActionIsValid(TankGame::Blue, 0,
+                        state.ActionIsValid(TankGame::Blue, 1,
                                             TankGame::Action(actBlue1)) &&
                         state.ActionIsValid(TankGame::Red, 0,
                                             TankGame::Action(actRed0)) &&
@@ -83,7 +93,7 @@ inline Node *Bot::RandomMove(Node *p) {
     return nullptr;
 }
 
-inline double Bot::Utility(TankGame::GameResult res) {
+double Bot::Utility(TankGame::GameResult res) {
     if (res == TankGame::Blue)
         return 1.0;
     else if (res == TankGame::Red)
@@ -93,7 +103,7 @@ inline double Bot::Utility(TankGame::GameResult res) {
 }
 
 // random roll-out until terminal state
-inline void Bot::RollOut(Node *p) {
+void Bot::RollOut(Node *p) {
     Node *ch;
     for (Node *t = p;; t = ch, Move(t->pol)) {
         ch = RandomMove(t);
@@ -110,7 +120,7 @@ inline void Bot::RollOut(Node *p) {
     }
 }
 
-inline void Bot::BackPropagation(Node *p, double utility) {
+void Bot::BackPropagation(Node *p, double utility) {
     while (p) {
         p->val = (p->val * p->vis + utility) / (p->vis + 1);
         p->vis++;
@@ -120,7 +130,7 @@ inline void Bot::BackPropagation(Node *p, double utility) {
 }
 
 // Using Decoupled UCT
-inline void Bot::Update(Node *p) {
+void Bot::Update(Node *p) {
     memset(val, 0, sizeof val);
     memset(vis, 0, sizeof vis);
     for (auto &i : p->ch) {
@@ -133,7 +143,7 @@ inline void Bot::Update(Node *p) {
         vis[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
             i.second->vis;
     }
-    double mx = 0, tmp;
+    double mx = -1, tmp;
     int act_1 = -1, act_2 = -1;
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
@@ -148,7 +158,7 @@ inline void Bot::Update(Node *p) {
         }
     }
     Policy polBlue(act_1 - 1, act_2 - 1);
-    mx = 0;
+    mx = -1;
     act_1 = -1, act_2 = -1;
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
@@ -163,20 +173,32 @@ inline void Bot::Update(Node *p) {
         }
     }
     Policy polRed(act_1 - 1, act_2 - 1);
-    p->bstCh = p->ch[std::make_pair(polBlue, polRed)];
+    std::pair<Policy, Policy> pol = std::make_pair(polBlue, polRed);
+    if (!p->ch.count(pol))
+        p->bstCh = p->NewChild(pol);
+    else
+        p->bstCh = p->ch[pol];
 }
 
-inline void Bot::Train() {
+int Bot::Train() {
+    int ret = 0;
+#ifdef _BOTZONE_ONLINE
     while ((unsigned)clock() < timing) {
+#else 
+    for(int ___=0;___<15;___++) {
+#endif
         for (int i = 0; i < TRAIN_UNIT; i++) {
-            if (!UCTSearch()) return;
+            if (!MCTS()) return ret;
         }
+        ret++;
     }
+    return ret;
 }
 
 // return mySide policy
 Policy Bot::Play() {
-    Train();
+    int res = Train();
+    printf("%d\n", res);
     if (root->ch.empty()) return Policy(-2, -2);
     memset(vis, 0, sizeof vis);
     bool flag = state.mySide == TankGame::Red;
