@@ -95,7 +95,7 @@ class Bot {
 
     int Train();
 
-    Policy Play();
+    Policy GenDecision();
 
     void Play(const std::pair<Policy, Policy> &);
 };

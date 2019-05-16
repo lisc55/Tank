@@ -14,7 +14,7 @@ int main() {
     ReadInput(std::cin, data, globaldata);
     Bot bot(*field);
     bot.SetTime(TIME_LIMIT + 1.0);
-    Policy decision = bot.Play();
+    Policy decision = bot.GenDecision();
     field->DebugPrint();
     SubmitAndDontExit(Action(decision.act_0), Action(decision.act_1));
     while (1) {
@@ -25,7 +25,7 @@ int main() {
                    field->previousActions[field->currentTurn][0][1]),
             Policy(field->previousActions[field->currentTurn][1][0],
                    field->previousActions[field->currentTurn][1][1])));
-        decision = bot.Play();
+        decision = bot.GenDecision();
         field->DebugPrint();
         SubmitAndDontExit(Action(decision.act_0), Action(decision.act_1));
     }

@@ -182,11 +182,7 @@ void Bot::Update(Node *p) {
 
 int Bot::Train() {
     int ret = 0;
-#ifdef _BOTZONE_ONLINE
     while ((unsigned)clock() < timing) {
-#else 
-    for(int ___=0;___<15;___++) {
-#endif
         for (int i = 0; i < TRAIN_UNIT; i++) {
             if (!MCTS()) return ret;
         }
@@ -196,7 +192,7 @@ int Bot::Train() {
 }
 
 // return mySide policy
-Policy Bot::Play() {
+Policy Bot::GenDecision() {
     int res = Train();
     printf("%d\n", res);
     if (root->ch.empty()) return Policy(-2, -2);
