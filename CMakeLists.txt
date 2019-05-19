@@ -3,6 +3,8 @@ project(Tank)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_compile_options(-O2)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../)
 
 set(CMAKE_BUILD_TYPE "Debug")
