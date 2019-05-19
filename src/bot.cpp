@@ -26,10 +26,10 @@ bool Bot::MCTS() {
 
 void Bot::Move(const std::pair<Policy, Policy> &pol) {
     if (pol.first.empty() && pol.first.empty()) return;
-    state.nextAction[TankGame::Blue][0] = TankGame::Action(pol.first.act_0),
-    state.nextAction[TankGame::Blue][1] = TankGame::Action(pol.first.act_1);
-    state.nextAction[TankGame::Red][0] = TankGame::Action(pol.second.act_0);
-    state.nextAction[TankGame::Red][1] = TankGame::Action(pol.second.act_1);
+    state.nextAction[0][0] = TankGame::Action(pol.first.act_0),
+    state.nextAction[0][1] = TankGame::Action(pol.first.act_1);
+    state.nextAction[1][0] = TankGame::Action(pol.second.act_0);
+    state.nextAction[1][1] = TankGame::Action(pol.second.act_1);
     state.DoAction();
     // state.DebugPrint();
 }
@@ -37,17 +37,17 @@ void Bot::Move(const std::pair<Policy, Policy> &pol) {
 bool Bot::IsFullyExpanded(Node *p) {
     if (p->full) return 1;
     for (int actBlue0 = -1; actBlue0 < 8; actBlue0++) {
+        if (!state.tankAlive[0][0] && actBlue0 >= 0) break;
         for (int actBlue1 = -1; actBlue1 < 8; actBlue1++) {
+            if (!state.tankAlive[0][1] && actBlue1 >= 0) break;
             for (int actRed0 = -1; actRed0 < 8; actRed0++) {
+                if (!state.tankAlive[1][0] && actRed0 >= 0) break;
                 for (int actRed1 = -1; actRed1 < 8; actRed1++) {
-                    if (state.ActionIsValid(TankGame::Blue, 0,
-                                            TankGame::Action(actBlue0)) &&
-                        state.ActionIsValid(TankGame::Blue, 1,
-                                            TankGame::Action(actBlue1)) &&
-                        state.ActionIsValid(TankGame::Red, 0,
-                                            TankGame::Action(actRed0)) &&
-                        state.ActionIsValid(TankGame::Red, 1,
-                                            TankGame::Action(actRed1)) &&
+                    if (!state.tankAlive[1][1] && actRed1 >= 0) break;
+                    if (state.ActionIsValid(0, 0, TankGame::Action(actBlue0)) &&
+                        state.ActionIsValid(0, 1, TankGame::Action(actBlue1)) &&
+                        state.ActionIsValid(1, 0, TankGame::Action(actRed0)) &&
+                        state.ActionIsValid(1, 1, TankGame::Action(actRed1)) &&
                         !p->ch.count(std::make_pair(Policy(actBlue0, actBlue1),
                                                     Policy(actRed0, actRed1))))
                         return p->full = 0;
@@ -70,33 +70,37 @@ Node *Bot::RandomMove(Node *p) {
     std::random_shuffle(shuffled_list2, shuffled_list2 + 9);
     std::random_shuffle(shuffled_list3, shuffled_list3 + 9);
     for (auto actBlue0 : shuffled_list0) {
+        if (!state.tankAlive[0][0]) actBlue0 = -1;
         for (auto actBlue1 : shuffled_list1) {
+            if (!state.tankAlive[0][1]) actBlue1 = -1;
             for (auto actRed0 : shuffled_list2) {
+                if (!state.tankAlive[1][0]) actRed0 = -1;
                 for (auto actRed1 : shuffled_list3) {
-                    if (state.ActionIsValid(TankGame::Blue, 0,
-                                            TankGame::Action(actBlue0)) &&
-                        state.ActionIsValid(TankGame::Blue, 1,
-                                            TankGame::Action(actBlue1)) &&
-                        state.ActionIsValid(TankGame::Red, 0,
-                                            TankGame::Action(actRed0)) &&
-                        state.ActionIsValid(TankGame::Red, 1,
-                                            TankGame::Action(actRed1))) {
+                    if (!state.tankAlive[1][1]) actRed1 = -1;
+                    if (state.ActionIsValid(0, 0, TankGame::Action(actBlue0)) &&
+                        state.ActionIsValid(0, 1, TankGame::Action(actBlue1)) &&
+                        state.ActionIsValid(1, 0, TankGame::Action(actRed0)) &&
+                        state.ActionIsValid(1, 1, TankGame::Action(actRed1))) {
                         std::pair<Policy, Policy> pol =
                             std::make_pair(Policy(actBlue0, actBlue1),
                                            Policy(actRed0, actRed1));
                         if (!p->ch.count(pol)) { return p->NewChild(pol); }
                     }
+                    if (!state.tankAlive[1][1]) break;
                 }
+                if (!state.tankAlive[1][0]) break;
             }
+            if (!state.tankAlive[0][1]) break;
         }
+        if (!state.tankAlive[0][0]) break;
     }
     return nullptr;
 }
 
 double Bot::Utility(TankGame::GameResult res) {
-    if (res == TankGame::Blue)
+    if (res == 0)
         return 1.0;
-    else if (res == TankGame::Red)
+    else if (res == 1)
         return 0.0;
     else
         return 0.5;
@@ -131,17 +135,20 @@ void Bot::BackPropagation(Node *p, double utility) {
 
 // Using Decoupled UCT
 void Bot::Update(Node *p) {
+    if (p->ch.empty()){
+        p->bstCh = nullptr;
+        return;
+    }
     memset(val, 0, sizeof val);
     memset(vis, 0, sizeof vis);
     for (auto &i : p->ch) {
-        val[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] +=
-            i.second->val;
-        val[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
-            1 - i.second->val;
-        vis[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] +=
-            i.second->vis;
-        vis[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
-            i.second->vis;
+        // if(i.first.first.act_0==-2){
+        //     puts("----");
+        // }
+        val[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] += i.second->val;
+        val[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] += 1 - i.second->val;
+        vis[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] += i.second->vis;
+        vis[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] += i.second->vis;
     }
     double mx = -1, tmp;
     int act_1 = -1, act_2 = -1;
@@ -183,6 +190,7 @@ void Bot::Update(Node *p) {
 int Bot::Train() {
     int ret = 0;
     while ((unsigned)clock() < timing) {
+        // printf("%d\n", root->CountSize());
         for (int i = 0; i < TRAIN_UNIT; i++) {
             if (!MCTS()) return ret;
         }
@@ -197,7 +205,7 @@ Policy Bot::GenDecision() {
     // printf("%d\n", res);
     if (root->ch.empty()) return Policy(-2, -2);
     memset(vis, 0, sizeof vis);
-    bool flag = state.mySide == TankGame::Red;
+    bool flag = state.mySide == 1;
     if (flag) {
         for (auto &p : root->ch) {
             vis[p.first.second.act_0 + 1][p.first.second.act_1 + 1][0]++;
