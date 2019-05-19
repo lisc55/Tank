@@ -135,7 +135,7 @@ void Bot::BackPropagation(Node *p, double utility) {
 
 // Using Decoupled UCT
 void Bot::Update(Node *p) {
-    if (p->ch.empty()){
+    if (p->ch.empty()) {
         p->bstCh = nullptr;
         return;
     }
@@ -145,10 +145,14 @@ void Bot::Update(Node *p) {
         // if(i.first.first.act_0==-2){
         //     puts("----");
         // }
-        val[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] += i.second->val;
-        val[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] += 1 - i.second->val;
-        vis[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] += i.second->vis;
-        vis[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] += i.second->vis;
+        val[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] +=
+            i.second->val;
+        val[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
+            1 - i.second->val;
+        vis[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] +=
+            i.second->vis;
+        vis[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
+            i.second->vis;
     }
     double mx = -1, tmp;
     int act_1 = -1, act_2 = -1;
