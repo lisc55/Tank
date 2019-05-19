@@ -59,8 +59,6 @@ class Bot {
     static constexpr double C = 0.9;
     static const int TRAIN_UNIT = 100;
 
-    std::mt19937 rng;
-
     // notice that the policy is in [-1,7], so we should +1 in the following
     double val[9][9][2];
     int vis[9][9][2];
@@ -71,8 +69,6 @@ class Bot {
     TankGame::TankField state;
 
     Bot(const TankGame::TankField &s) : state(s) {
-	    std::random_device rd;
-	    rng=std::mt19937(rd());
         root = new Node(std::make_pair(Policy(-2, -2), Policy(-2, -2)));
     }
     ~Bot() { delete root; }

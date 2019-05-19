@@ -9,6 +9,7 @@ int main() {
 #ifndef _BOTZONE_ONLINE
     freopen("in", "r", stdin);
 #endif
+    srand((unsigned)time(0));
     string data, globaldata;
     ReadInput(std::cin, data, globaldata);
     Bot bot(*field);

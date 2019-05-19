@@ -4,7 +4,7 @@ if [ "$1" = "make" ]; then
 	fi
 	cd build && cmake ../ && make && cd ..
 elif [ "$1" = "clean" ] ; then
-	rm Tank && cd build && rm -rf * && cd ..
+	rm Tank && cd build && rm -rf * && cd .. && rm -rf Tank.dSYM
 elif [ "$1" = "merge" ]; then
 	python3 merge.py
 elif [ "$1" = "format" ]; then
