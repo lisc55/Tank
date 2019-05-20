@@ -72,17 +72,15 @@ class Bot {
 
     unsigned long long timing;
 
+    const double TIME_LIMIT;
+
     Node *root;
     TankGame::TankField state;
 
-    Bot(const TankGame::TankField &s) : state(s) {
+    Bot(const TankGame::TankField &s) : state(s), TIME_LIMIT(0.8) {
         root = new Node(std::make_pair(Policy(-2, -2), Policy(-2, -2)));
     }
     ~Bot() { delete root; }
-
-    void SetTime(double period) {
-        timing = clock() + int(period * CLOCKS_PER_SEC);
-    }
 
     void Update(Node *);
 
@@ -102,7 +100,7 @@ class Bot {
 
     int Train();
 
-    Policy GenDecision();
+    Policy GenDecision(bool);
 
     void Play(const std::pair<Policy, Policy> &);
 };

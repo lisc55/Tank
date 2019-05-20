@@ -191,9 +191,16 @@ void Bot::Update(Node *p) {
         p->bstCh = p->ch[pol];
 }
 
+#define DEBUG
+#undef DEBUG
+
 int Bot::Train() {
     int ret = 0;
+#ifndef DEBUG
     while ((unsigned)clock() < timing) {
+#else
+    for (int __T = 0; __T < 60; __T++) {
+#endif
         // printf("%d\n", root->CountSize());
         for (int i = 0; i < TRAIN_UNIT; i++) {
             if (!MCTS()) return ret;
@@ -204,7 +211,9 @@ int Bot::Train() {
 }
 
 // return mySide policy
-Policy Bot::GenDecision() {
+Policy Bot::GenDecision(bool first) {
+    if(first)timing = clock() + int((1.0 + TIME_LIMIT) * CLOCKS_PER_SEC);
+    else timing = clock() + int(TIME_LIMIT * CLOCKS_PER_SEC);
     int res = Train();
     // printf("%d\n", res);
     if (root->ch.empty()) return Policy(-2, -2);
