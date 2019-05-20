@@ -9,7 +9,7 @@ TankGame::GameResult play(double C1, double C2) {
         TankJudge::fieldBinary[i] = TankJudge::waterBinary[i] = TankJudge::steelBinary[i] = 0;
     }   
     TankJudge::InitializeField();
-    TankGame::TankField *field =
+    TankGame::TankField *fieldCur =
         new TankGame::TankField(TankJudge::fieldBinary, TankJudge::waterBinary,
                                 TankJudge::steelBinary, 0);
     TankGame::TankField *fieldBlue =
@@ -18,19 +18,19 @@ TankGame::GameResult play(double C1, double C2) {
     TankGame::TankField *fieldRed =
         new TankGame::TankField(TankJudge::fieldBinary, TankJudge::waterBinary,
                                 TankJudge::steelBinary, 1);
-    // field->DebugPrint();
+    // fieldCur->DebugPrint();
     Bot botBlue(*fieldBlue, C1);
     Bot botRed(*fieldRed, C2);
     Policy polBlue = botBlue.GenDecision(1);
     Policy polRed = botRed.GenDecision(1);
     fprintf(LOG, "%d %d %d %d\n", polBlue.act_0, polBlue.act_1, polRed.act_0,
             polRed.act_1);
-    field->nextAction[0][0] = TankGame::Action(polBlue.act_0);
-    field->nextAction[0][1] = TankGame::Action(polBlue.act_1);
-    field->nextAction[1][0] = TankGame::Action(polRed.act_0);
-    field->nextAction[1][1] = TankGame::Action(polRed.act_1);
-    field->DoAction();
-    TankGame::GameResult res = field->GetGameResult();
+    fieldCur->nextAction[0][0] = TankGame::Action(polBlue.act_0);
+    fieldCur->nextAction[0][1] = TankGame::Action(polBlue.act_1);
+    fieldCur->nextAction[1][0] = TankGame::Action(polRed.act_0);
+    fieldCur->nextAction[1][1] = TankGame::Action(polRed.act_1);
+    fieldCur->DoAction();
+    TankGame::GameResult res = fieldCur->GetGameResult();
     if (res != TankGame::NotFinished) {
         fprintf(LOG, "Blue_C = %.3lf, Red_C = %.3lf, Result = ", C1, C2);
         if (res == TankGame::Blue)
@@ -39,7 +39,7 @@ TankGame::GameResult play(double C1, double C2) {
             fprintf(LOG, "Red\n\n");
         else
             fprintf(LOG, "Draw\n\n");
-        delete field;
+        delete fieldCur;
         delete fieldBlue;
         delete fieldRed;
         return res;
@@ -47,18 +47,18 @@ TankGame::GameResult play(double C1, double C2) {
     std::pair<Policy, Policy> pol(polBlue, polRed);
     botBlue.Play(pol);
     botRed.Play(pol);
-    // field->DebugPrint();
+    // fieldCur->DebugPrint();
     while (1) {
         Policy polBlue = botBlue.GenDecision(0);
         Policy polRed = botRed.GenDecision(0);
         fprintf(LOG, "%d %d %d %d\n", polBlue.act_0, polBlue.act_1,
                 polRed.act_0, polRed.act_1);
-        field->nextAction[0][0] = TankGame::Action(polBlue.act_0);
-        field->nextAction[0][1] = TankGame::Action(polBlue.act_1);
-        field->nextAction[1][0] = TankGame::Action(polRed.act_0);
-        field->nextAction[1][1] = TankGame::Action(polRed.act_1);
-        field->DoAction();
-        TankGame::GameResult res = field->GetGameResult();
+        fieldCur->nextAction[0][0] = TankGame::Action(polBlue.act_0);
+        fieldCur->nextAction[0][1] = TankGame::Action(polBlue.act_1);
+        fieldCur->nextAction[1][0] = TankGame::Action(polRed.act_0);
+        fieldCur->nextAction[1][1] = TankGame::Action(polRed.act_1);
+        fieldCur->DoAction();
+        TankGame::GameResult res = fieldCur->GetGameResult();
         if (res != TankGame::NotFinished) {
             fprintf(LOG, "Blue_C = %.3lf, Red_C = %.3lf, Result = ", C1, C2);
             if (res == TankGame::Blue)
@@ -67,7 +67,7 @@ TankGame::GameResult play(double C1, double C2) {
                 fprintf(LOG, "Red\n\n");
             else
                 fprintf(LOG, "Draw\n\n");
-            delete field;
+            delete fieldCur;
             delete fieldBlue;
             delete fieldRed;
             return res;
@@ -75,7 +75,7 @@ TankGame::GameResult play(double C1, double C2) {
         std::pair<Policy, Policy> pol(polBlue, polRed);
         botBlue.Play(pol);
         botRed.Play(pol);
-        // field->DebugPrint();
+        // fieldCur->DebugPrint();
     }
 }
 
