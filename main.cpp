@@ -21,10 +21,10 @@ int main() {
         ReadInput(std::cin, data, globaldata);
         bot.SetTime(TIME_LIMIT);
         bot.Play(std::make_pair(
-            Policy(field->previousActions[field->currentTurn][0][0],
-                   field->previousActions[field->currentTurn][0][1]),
-            Policy(field->previousActions[field->currentTurn][1][0],
-                   field->previousActions[field->currentTurn][1][1])));
+            Policy(field->previousActions[field->currentTurn - 1][0][0],
+                   field->previousActions[field->currentTurn - 1][0][1]),
+            Policy(field->previousActions[field->currentTurn - 1][1][0],
+                   field->previousActions[field->currentTurn - 1][1][1])));
         decision = bot.GenDecision();
         field->DebugPrint();
         SubmitAndDontExit(Action(decision.act_0), Action(decision.act_1));
