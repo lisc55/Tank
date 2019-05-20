@@ -5,6 +5,9 @@
 FILE *LOG, *RES;
 
 TankGame::GameResult play(double C1, double C2) {
+    for(int i=0;i<3;i++){
+        TankJudge::fieldBinary[i] = TankJudge::waterBinary[i] = TankJudge::steelBinary[i] = 0;
+    }   
     TankJudge::InitializeField();
     TankGame::TankField *field =
         new TankGame::TankField(TankJudge::fieldBinary, TankJudge::waterBinary,
