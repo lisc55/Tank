@@ -87,7 +87,7 @@ int main() {
             if (abs(i - j) > 1e-5) {
                 int T = 5;
                 for (int _T = 1; _T < T; _T++) {
-                    printf("%.3lf %.3lf round %d", i, j, _T);
+                    printf("%.3lf %.3lf round %d\n", i, j, _T);fflush(stdout);
                     TankGame::GameResult res = play(i, j);
                     if (res == TankGame::Blue)
                         result[i] += 2;
