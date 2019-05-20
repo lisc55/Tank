@@ -63,8 +63,8 @@ class Node {
 
 class Bot {
    public:
-    static constexpr double C = 0.9;
-    static const int TRAIN_UNIT = 100;
+    const double C;
+    const int TRAIN_UNIT = 100;
 
     // notice that the policy is in [-1,7], so we should +1 in the following
     double val[9][9][2];
@@ -77,7 +77,7 @@ class Bot {
     Node *root;
     TankGame::TankField state;
 
-    Bot(const TankGame::TankField &s) : state(s), TIME_LIMIT(0.8) {
+    Bot(const TankGame::TankField &s, double C) : state(s), TIME_LIMIT(0.8), C(C) {
         root = new Node(std::make_pair(Policy(-2, -2), Policy(-2, -2)));
     }
     ~Bot() { delete root; }

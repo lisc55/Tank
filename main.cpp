@@ -12,7 +12,7 @@ int main() {
     srand((unsigned)time(0));
     string data, globaldata;
     ReadInput(std::cin, data, globaldata);
-    Bot bot(*field);
+    Bot bot(*field,0.9);
     Policy decision = bot.GenDecision(1);
     field->DebugPrint();
     SubmitAndDontExit(Action(decision.act_0), Action(decision.act_1));
