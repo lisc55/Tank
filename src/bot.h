@@ -77,7 +77,7 @@ class Bot {
     Node *root;
     TankGame::TankField state;
 
-    Bot(const TankGame::TankField &s, double C) : state(s), TIME_LIMIT(0.8), C(C) {
+    Bot(const TankGame::TankField &s, double C) : state(s), TIME_LIMIT(0.1), C(C) {
         root = new Node(std::make_pair(Policy(-2, -2), Policy(-2, -2)));
     }
     ~Bot() { delete root; }
