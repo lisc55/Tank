@@ -25,7 +25,7 @@ bool Bot::MCTS() {
 }
 
 void Bot::Move(const std::pair<Policy, Policy> &pol) {
-    if (pol.first.empty() && pol.first.empty()) return;
+    if (pol.first.empty() && pol.second.empty()) return;
     state.nextAction[0][0] = TankGame::Action(pol.first.act_0),
     state.nextAction[0][1] = TankGame::Action(pol.first.act_1);
     state.nextAction[1][0] = TankGame::Action(pol.second.act_0);
@@ -126,7 +126,7 @@ void Bot::RollOut(Node *p) {
 
 void Bot::BackPropagation(Node *p, double utility) {
     while (p) {
-        p->val = (p->val * p->vis + utility) / (p->vis + 1);
+        p->val += utility;
         p->vis++;
         Update(p);
         p = p->fa;
@@ -148,7 +148,7 @@ void Bot::Update(Node *p) {
         val[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] +=
             i.second->val;
         val[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
-            1 - i.second->val;
+            i.second->val;
         vis[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] +=
             i.second->vis;
         vis[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
@@ -174,7 +174,7 @@ void Bot::Update(Node *p) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
             if (vis[i][j][1]) {
-                tmp = val[i][j][1] / vis[i][j][1] +  // Expectaion
+                tmp = 1.0 - val[i][j][1] / vis[i][j][1] +  // Expectaion
                       C * sqrt(log(p->vis) / vis[i][j][1]);  // UCB length
                 if (tmp > mx) {
                     mx = tmp;
@@ -209,22 +209,49 @@ Policy Bot::GenDecision() {
     // printf("%d\n", res);
     if (root->ch.empty()) return Policy(-2, -2);
     memset(vis, 0, sizeof vis);
+    memset(val, 0, sizeof val);
     bool flag = state.mySide == 1;
     if (flag) {
         for (auto &p : root->ch) {
-            vis[p.first.second.act_0 + 1][p.first.second.act_1 + 1][0]++;
+            vis[p.first.second.act_0 + 1][p.first.second.act_1 + 1][0] +=
+                p.second->vis;
+            val[p.first.second.act_0 + 1][p.first.second.act_1 + 1][0] +=
+                p.second->val;
+        }
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (vis[i][j][0])
+                    val[i][j][0] = 1 - val[i][j][0] / vis[i][j][0];
+                else
+                    val[i][j][0] = 0;
+            }
         }
     } else {
         for (auto &p : root->ch) {
-            vis[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0]++;
+            vis[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0] +=
+                p.second->vis;
+            val[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0] +=
+                p.second->val;
+        }
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (vis[i][j][0])
+                    val[i][j][0] = val[i][j][0] / vis[i][j][0];
+                else
+                    val[i][j][0] = 0;
+            }
         }
     }
-    int max = 0;
+    // for (int i = 0; i < 9; i++) {
+    //     for (int j = 0; j < 9; j++) { printf("%.2lf ", val[i][j][0]); }
+    //     puts("");
+    // }
+    double max = 0;
     int act_0 = -1, act_1 = -1;
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
-            if (max < vis[i][j][0]) {
-                max = vis[i][j][0];
+            if (max < val[i][j][0]) {
+                max = val[i][j][0];
                 act_0 = i, act_1 = j;
             }
         }
@@ -238,5 +265,5 @@ void Bot::Play(const std::pair<Policy, Policy> &pol) {
     else
         root = root->ch[pol];
     root->DelFather();
-    move(root->pol);
+    Move(root->pol);
 }
