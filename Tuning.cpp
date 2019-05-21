@@ -25,7 +25,7 @@ int main() {
                     } else if (res == 2) {
                         final_res[j] += 2;
                         printf("Result = Red\n", i, j);
-                    } else if (res == 0){
+                    } else if (res == 0) {
                         final_res[i]++, final_res[j]++;
                         printf("Result = Draw\n", i, j);
                     }

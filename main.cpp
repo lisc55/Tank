@@ -6,13 +6,13 @@ using namespace TankGame;
 const double TIME_LIMIT = 0.80;
 
 int main() {
-#ifndef _BOTZONE_ONLINE
-    freopen("in", "r", stdin);
-#endif
+    // #ifndef _BOTZONE_ONLINE
+    //     freopen("in", "r", stdin);
+    // #endif
     srand((unsigned)time(0));
     string data, globaldata;
     ReadInput(std::cin, data, globaldata);
-    Bot bot(*field,0.9);
+    Bot bot(*field, 0.9);
     Policy decision = bot.GenDecision(1);
     field->DebugPrint();
     SubmitAndDontExit(Action(decision.act_0), Action(decision.act_1));

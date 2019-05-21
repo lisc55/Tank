@@ -155,6 +155,7 @@ class TankField {
     FieldItem gameField[fieldHeight][fieldWidth];
     bool tankAlive[sideCount][tankPerSide] = {{true, true}, {true, true}};
     bool baseAlive[sideCount] = {true, true};
+    bool shouldInit = false;
     int tankX[sideCount][tankPerSide] = {
         {fieldWidth / 2 - 2, fieldWidth / 2 + 2},
         {fieldWidth / 2 + 2, fieldWidth / 2 - 2}};

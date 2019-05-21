@@ -212,8 +212,10 @@ int Bot::Train() {
 
 // return mySide policy
 Policy Bot::GenDecision(bool first) {
-    if(first)timing = clock() + int((1.0 + TIME_LIMIT) * CLOCKS_PER_SEC);
-    else timing = clock() + int(TIME_LIMIT * CLOCKS_PER_SEC);
+    if (first)
+        timing = clock() + int((1.0 + TIME_LIMIT) * CLOCKS_PER_SEC);
+    else
+        timing = clock() + int(TIME_LIMIT * CLOCKS_PER_SEC);
     int res = Train();
     // printf("%d\n", res);
     if (root->ch.empty()) return Policy(-2, -2);

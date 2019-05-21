@@ -5,7 +5,7 @@
 FILE *LOG;
 
 int main(int argc, char **argv) {
-    LOG=fopen("log","a");
+    LOG = fopen("log", "a");
     double C1 = atof(argv[1]);
     double C2 = atof(argv[2]);
     srand((unsigned)time(0));
