@@ -1,12 +1,67 @@
 #include "bot.h"
+#include <cassert>
+#include "rule.h"
 
 void Print(Node *p) {
     for (auto i : p->ch) {
-        printf("((%d, %d), (%d, %d)) %p\n", i.first.first.act_0,
-               i.first.first.act_1, i.first.second.act_0, i.first.second.act_1,
-               i.second);
+        printf("((%d, %d), (%d, %d)) %p\n", i.first.first.act_0, i.first.first.act_1, i.first.second.act_0,
+               i.first.second.act_1, i.second);
     }
     puts("");
+}
+
+std::pair<double, double> Bot::Eval(Node *p, TankGame::TankField &s) {
+    double resb, resr;
+    TankGame::MarkTheField(s);
+    TankGame::DistanceToBase(0, s);
+    TankGame::DistanceToBase(1, s);
+    // 距离和中枪的评估，红蓝互为相反数
+    resb = (-s.distance[1][s.tankY[0][0]][s.tankX[0][0]] - s.distance[1][s.tankY[0][1]][s.tankX[0][1]] +
+            s.distance[0][s.tankY[1][0]][s.tankX[1][0]] + s.distance[0][s.tankY[1][1]][s.tankX[1][1]]) *
+               dist_c +
+           (-s.mark[0][s.tankY[0][0]][s.tankX[0][0]] - s.mark[0][s.tankY[0][1]][s.tankX[0][1]] +
+            s.mark[1][s.tankY[1][0]][s.tankX[1][0]] + s.mark[1][s.tankY[1][1]][s.tankX[1][1]]) *
+               shoot_c;
+    resr = -resb;
+    return std::make_pair(resb, resr);
+}
+
+std::pair<double, double> Bot::Penalty(Node *p, TankGame::TankField &s) {
+    double resb = 0, resr = 0;
+    // 注意s要返回之前的局面一下
+    if (!s.Revert()) return std::make_pair(resb, resr);
+    // 向空地、钢铁和队友射击的惩罚
+    short noeff_penalty[2] = {2, 2}, self_kill_penalty[2] = {0};
+    // 看看在向什么地方射击
+    for (int side = 0; side < TankGame::sideCount; side++)
+        for (int tank = 0; tank < TankGame::tankPerSide; tank++) {
+            TankGame::Action act = s.previousActions[s.currentTurn][side][tank];
+            if (ActionIsShoot(act)) {
+                int dir = ExtractDirectionFromAction(act);
+                int x = s.tankX[side][tank], y = s.tankY[side][tank];
+                while (true) {
+                    x += TankGame::dx[dir];
+                    y += TankGame::dy[dir];
+                    if (!TankGame::CoordValid(x, y)) break;
+                    TankGame::FieldItem items = s.gameField[y][x];
+                    if (items != TankGame::None && items != TankGame::Water && items != TankGame::Steel) {
+                        if (x == s.tankX[side][!tank] && y == s.tankY[side][!tank]) self_kill_penalty[side]++;
+                        noeff_penalty[side]--;
+                        break;
+                    }
+                }
+            } else
+                noeff_penalty[side]--;
+        }
+    resb -= noeff_penalty[0] * noteff_shoot_c + self_kill_penalty[0] * self_kill_c;
+    resr -= noeff_penalty[1] * noteff_shoot_c + self_kill_penalty[1] * self_kill_c;
+
+    // 如果和纯规则的策略一样，给予适当的奖励
+    std::pair<int, int> ruleBlue = TankGame::RuleDecision(0, s);
+    std::pair<int, int> ruleRed = TankGame::RuleDecision(1, s);
+    if (p->fa->pol.first == Policy(ruleBlue.first, ruleBlue.second)) resb += rule_c;
+    if (p->fa->pol.second == Policy(ruleRed.first, ruleRed.second)) resb += rule_c;
+    return std::make_pair(resb, resr);
 }
 
 bool Bot::MCTS() {
@@ -48,8 +103,7 @@ bool Bot::IsFullyExpanded(Node *p) {
                         state.ActionIsValid(0, 1, TankGame::Action(actBlue1)) &&
                         state.ActionIsValid(1, 0, TankGame::Action(actRed0)) &&
                         state.ActionIsValid(1, 1, TankGame::Action(actRed1)) &&
-                        !p->ch.count(std::make_pair(Policy(actBlue0, actBlue1),
-                                                    Policy(actRed0, actRed1))))
+                        !p->ch.count(std::make_pair(Policy(actBlue0, actBlue1), Policy(actRed0, actRed1))))
                         return p->full = 0;
                 }
             }
@@ -82,8 +136,7 @@ Node *Bot::RandomMove(Node *p) {
                         state.ActionIsValid(1, 0, TankGame::Action(actRed0)) &&
                         state.ActionIsValid(1, 1, TankGame::Action(actRed1))) {
                         std::pair<Policy, Policy> pol =
-                            std::make_pair(Policy(actBlue0, actBlue1),
-                                           Policy(actRed0, actRed1));
+                            std::make_pair(Policy(actBlue0, actBlue1), Policy(actRed0, actRed1));
                         if (!p->ch.count(pol)) { return p->NewChild(pol); }
                     }
                     if (!state.tankAlive[1][1]) break;
@@ -97,36 +150,31 @@ Node *Bot::RandomMove(Node *p) {
     return nullptr;
 }
 
-double Bot::Utility(TankGame::GameResult res) {
-    if (res == 0)
-        return 1.0;
-    else if (res == 1)
-        return 0.0;
-    else
-        return 0.5;
-}
-
-// random roll-out until terminal state
+// roll-out
 void Bot::RollOut(Node *p) {
     Node *ch;
+    int count = 0;
+    std::pair<double, double> pen = Penalty(p, state);
+    Move(p->pol);
     for (Node *t = p;; t = ch, Move(t->pol)) {
         ch = RandomMove(t);
-        TankGame::GameResult res = state.GetGameResult();
-        if (res != TankGame::NotFinished) {
-            if (!p->ch.empty()) {
-                delete p->ch.begin()->second;
-                p->full = 0;
-                p->ch.clear();
-            }
-            BackPropagation(p, Utility(res));
-            return;
-        }
+        if (++count > rollOut) break;
     }
+    if (!p->ch.empty()) {
+        delete p->ch.begin()->second;
+        p->full = 0;
+        p->ch.clear();
+    }
+    std::pair<double, double> eva = Eval(p, state);
+    eva.first += pen.first;
+    eva.second += pen.second;
+    BackPropagation(p, eva);
 }
 
-void Bot::BackPropagation(Node *p, double utility) {
+void Bot::BackPropagation(Node *p, const std::pair<double, double> &u) {
     while (p) {
-        p->val += utility;
+        p->val.first += u.first;
+        p->val.second += u.second;
         p->vis++;
         Update(p);
         p = p->fa;
@@ -145,14 +193,10 @@ void Bot::Update(Node *p) {
         // if(i.first.first.act_0==-2){
         //     puts("----");
         // }
-        val[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] +=
-            i.second->val;
-        val[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
-            i.second->val;
-        vis[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] +=
-            i.second->vis;
-        vis[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
-            i.second->vis;
+        val[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] += i.second->val.first;
+        val[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] += i.second->val.second;
+        vis[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] += i.second->vis;
+        vis[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] += i.second->vis;
     }
     double mx = -1, tmp;
     int act_1 = -1, act_2 = -1;
@@ -174,7 +218,7 @@ void Bot::Update(Node *p) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
             if (vis[i][j][1]) {
-                tmp = 1.0 - val[i][j][1] / vis[i][j][1] +  // Expectaion
+                tmp = val[i][j][1] / vis[i][j][1] +  // Expectaion
                       C * sqrt(log(p->vis) / vis[i][j][1]);  // UCB length
                 if (tmp > mx) {
                     mx = tmp;
@@ -190,9 +234,6 @@ void Bot::Update(Node *p) {
     else
         p->bstCh = p->ch[pol];
 }
-
-#define DEBUG
-#undef DEBUG
 
 int Bot::Train() {
     int ret = 0;
@@ -217,32 +258,28 @@ Policy Bot::GenDecision(bool first) {
     else
         timing = clock() + int(TIME_LIMIT * CLOCKS_PER_SEC);
     int res = Train();
-    // printf("%d\n", res);
+    // printf("Train rounds: %d\n", res);
     if (root->ch.empty()) return Policy(-2, -2);
     memset(vis, 0, sizeof vis);
     memset(val, 0, sizeof val);
     bool flag = state.mySide == 1;
     if (flag) {
         for (auto &p : root->ch) {
-            vis[p.first.second.act_0 + 1][p.first.second.act_1 + 1][0] +=
-                p.second->vis;
-            val[p.first.second.act_0 + 1][p.first.second.act_1 + 1][0] +=
-                p.second->val;
+            vis[p.first.second.act_0 + 1][p.first.second.act_1 + 1][1] += p.second->vis;
+            val[p.first.second.act_0 + 1][p.first.second.act_1 + 1][1] += p.second->val.second;
         }
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                if (vis[i][j][0])
-                    val[i][j][0] = 1 - val[i][j][0] / vis[i][j][0];
+                if (vis[i][j][1])
+                    val[i][j][0] = val[i][j][1] / vis[i][j][1];
                 else
                     val[i][j][0] = 0;
             }
         }
     } else {
         for (auto &p : root->ch) {
-            vis[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0] +=
-                p.second->vis;
-            val[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0] +=
-                p.second->val;
+            vis[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0] += p.second->vis;
+            val[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0] += p.second->val.first;
         }
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {

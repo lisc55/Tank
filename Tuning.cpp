@@ -13,8 +13,7 @@ int main() {
     for (auto i : C_LIST) {
         for (auto j : C_LIST) {
             if (fabs(i - j) > 1e-5) {
-                string cmd = string("./Play ") + to_string(i) + string(" ") +
-                             to_string(j);
+                string cmd = string("./Play ") + to_string(i) + string(" ") + to_string(j);
                 int T = 5;
                 for (int _ = 1; _ <= 5; _++) {
                     printf("%.3lf %.3lf round %d ", i, j, _);

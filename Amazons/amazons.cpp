@@ -40,8 +40,7 @@ const double TIME_LIMIT = 0.95;
 const int SIZE = 8;
 const int dx[] = {1, 1, 0, -1, -1, -1, 0, 1};
 const int dy[] = {0, -1, -1, -1, 0, 1, 1, 1};
-const int init_pos[8][2] = {{0, 2}, {2, 0}, {5, 0}, {7, 2},
-                            {0, 5}, {2, 7}, {5, 7}, {7, 5}};
+const int init_pos[8][2] = {{0, 2}, {2, 0}, {5, 0}, {7, 2}, {0, 5}, {2, 7}, {5, 7}, {7, 5}};
 const double INF = 1e10;
 
 const int FACT8 = 40320;
@@ -59,32 +58,22 @@ struct state {
         memset(a, 0, sizeof a);
         a[0][2] = a[2][0] = a[5][0] = a[7][2] = 1;
         a[0][5] = a[2][7] = a[5][7] = a[7][5] = 2;
-        for (int i = 0; i < 8; i++)
-            pos[i][0] = init_pos[i][0], pos[i][1] = init_pos[i][1];
+        for (int i = 0; i < 8; i++) pos[i][0] = init_pos[i][0], pos[i][1] = init_pos[i][1];
     }
     int *operator[](int x) { return a[x]; }
 };
 
 state A;
 
-inline bool out_of_bound(int x, int y) {
-    return x < 0 || x >= SIZE || y < 0 || y >= SIZE;
-}
+inline bool out_of_bound(int x, int y) { return x < 0 || x >= SIZE || y < 0 || y >= SIZE; }
 
 inline bool eq(double a, double b) { return abs(a - b) < 1e-6; }
 
 inline int policy(int x_0, int y_0, int x_1, int y_1, int x_2, int y_2) {
-    return (x_0 << 15) + (y_0 << 12) + (x_1 << 9) + (y_1 << 6) + (x_2 << 3) +
-           y_2;
+    return (x_0 << 15) + (y_0 << 12) + (x_1 << 9) + (y_1 << 6) + (x_2 << 3) + y_2;
 }
 
-inline void trans_policy(int p,
-                         int &x_0,
-                         int &y_0,
-                         int &x_1,
-                         int &y_1,
-                         int &x_2,
-                         int &y_2) {
+inline void trans_policy(int p, int &x_0, int &y_0, int &x_1, int &y_1, int &x_2, int &y_2) {
     y_2 = p & 7, p >>= 3;
     x_2 = p & 7, p >>= 3;
     y_1 = p & 7, p >>= 3;
@@ -101,13 +90,7 @@ struct node {
     int dep, pol;
     bool full;
     node(int pol, node *fa = nullptr)
-        : vis(0),
-          val(0.0),
-          fa(fa),
-          bst_ch(nullptr),
-          dep(fa ? fa->dep + 1 : 0),
-          pol(pol),
-          full(0) {}
+        : vis(0), val(0.0), fa(fa), bst_ch(nullptr), dep(fa ? fa->dep + 1 : 0), pol(pol), full(0) {}
     ~node() {
         for (auto &p : ch) delete p.second;
     }
@@ -121,10 +104,7 @@ struct node {
 
 node *root = new node(-1);
 
-inline double UCB1(node *p) {
-    return ((p->dep & 1) ? (p->val) : (1 - p->val)) +
-           C * sqrt(log(p->fa->vis) / p->vis);
-}
+inline double UCB1(node *p) { return ((p->dep & 1) ? (p->val) : (1 - p->val)) + C * sqrt(log(p->fa->vis) / p->vis); }
 
 void update(node *p) {
     node *bst = nullptr;
@@ -142,23 +122,18 @@ void update(node *p) {
 inline bool is_fully_expanded(node *p) {
     if (p->full) return 1;
     int Dx, Dy, DX, DY;
-    for (int id = (p->dep & 1) ? 4 : 0, U = (p->dep & 1) ? 8 : 4; id < U;
-         id++) {
+    for (int id = (p->dep & 1) ? 4 : 0, U = (p->dep & 1) ? 8 : 4; id < U; id++) {
         int cur_x = A.pos[id][0], cur_y = A.pos[id][1];
         for (int dir1 = 0; dir1 < 8; dir1++) {
             Dx = dx[dir1], Dy = dy[dir1];
-            for (int nxt_x = cur_x + Dx, nxt_y = cur_y + Dy;
-                 !out_of_bound(nxt_x, nxt_y) && !A[nxt_x][nxt_y];
+            for (int nxt_x = cur_x + Dx, nxt_y = cur_y + Dy; !out_of_bound(nxt_x, nxt_y) && !A[nxt_x][nxt_y];
                  nxt_x += Dx, nxt_y += Dy) {
                 for (int dir2 = 0; dir2 < 8; dir2++) {
                     DX = dx[dir2], DY = dy[dir2];
                     for (int arr_x = nxt_x + DX, arr_y = nxt_y + DY;
-                         !out_of_bound(arr_x, arr_y) &&
-                         (!A[arr_x][arr_y] || cur_x == arr_x && cur_y == arr_y);
+                         !out_of_bound(arr_x, arr_y) && (!A[arr_x][arr_y] || cur_x == arr_x && cur_y == arr_y);
                          arr_x += DX, arr_y += DY) {
-                        if (!p->ch.count(policy(cur_x, cur_y, nxt_x, nxt_y,
-                                                arr_x, arr_y)))
-                            return p->full = 0;
+                        if (!p->ch.count(policy(cur_x, cur_y, nxt_x, nxt_y, arr_x, arr_y))) return p->full = 0;
                     }
                 }
             }
@@ -173,8 +148,7 @@ inline void move(int pol) {
     int role = A[x][y];
     for (int i = 0; i < 8; i++) {
         if (A.pos[i][0] == x && A.pos[i][1] == y) {
-            A[A.pos[i][0] = (pol & 3584) >> 9][A.pos[i][1] = (pol & 448) >> 6] =
-                role;
+            A[A.pos[i][0] = (pol & 3584) >> 9][A.pos[i][1] = (pol & 448) >> 6] = role;
             A[x][y] = 0;
             A[(pol & 56) >> 3][pol & 7] = 3;
             break;
@@ -200,19 +174,16 @@ inline node *random_move(node *p) {
             int d1 = shuffled_list1[dir1];
             int CNT = 0, POL;
             Dx = dx[d1], Dy = dy[d1];
-            for (int nxt_x = cur_x + Dx, nxt_y = cur_y + Dy;
-                 !out_of_bound(nxt_x, nxt_y) && !A[nxt_x][nxt_y];
+            for (int nxt_x = cur_x + Dx, nxt_y = cur_y + Dy; !out_of_bound(nxt_x, nxt_y) && !A[nxt_x][nxt_y];
                  nxt_x += Dx, nxt_y += Dy) {
                 for (int dir2 = 0; dir2 < 8; dir2++) {
                     int d2 = shuffled_list2[dir2];
                     int cnt = 0, pol;
                     DX = dx[d2], DY = dy[d2];
                     for (int arr_x = nxt_x + DX, arr_y = nxt_y + DY;
-                         !out_of_bound(arr_x, arr_y) &&
-                         (!A[arr_x][arr_y] || cur_x == arr_x && cur_y == arr_y);
+                         !out_of_bound(arr_x, arr_y) && (!A[arr_x][arr_y] || cur_x == arr_x && cur_y == arr_y);
                          arr_x += DX, arr_y += DY) {
-                        int cur_pol =
-                            policy(cur_x, cur_y, nxt_x, nxt_y, arr_x, arr_y);
+                        int cur_pol = policy(cur_x, cur_y, nxt_x, nxt_y, arr_x, arr_y);
                         if (!p->ch.count(cur_pol)) {
                             if (!(rand() % (++cnt))) pol = cur_pol;
                         }
@@ -276,11 +247,8 @@ inline void calc_Queen_1() {
         int x = cur.x, y = cur.y, d = cur.d, Dx, Dy;
         for (int i = 0; i < 8; i++) {
             Dx = dx[i], Dy = dy[i];
-            for (int _x = x + Dx, _y = y + Dy;
-                 !out_of_bound(_x, _y) && !A[_x][_y]; _x += Dx, _y += Dy) {
-                if (!~Queen_1[_x][_y]) {
-                    Q.push(Qnode(_x, _y, Queen_1[_x][_y] = d + 1));
-                }
+            for (int _x = x + Dx, _y = y + Dy; !out_of_bound(_x, _y) && !A[_x][_y]; _x += Dx, _y += Dy) {
+                if (!~Queen_1[_x][_y]) { Q.push(Qnode(_x, _y, Queen_1[_x][_y] = d + 1)); }
             }
         }
     }
@@ -300,11 +268,8 @@ inline void calc_Queen_2() {
         int x = cur.x, y = cur.y, d = cur.d, Dx, Dy;
         for (int i = 0; i < 8; i++) {
             Dx = dx[i], Dy = dy[i];
-            for (int _x = x + Dx, _y = y + Dy;
-                 !out_of_bound(_x, _y) && !A[_x][_y]; _x += Dx, _y += Dy) {
-                if (!~Queen_2[_x][_y]) {
-                    Q.push(Qnode(_x, _y, Queen_2[_x][_y] = d + 1));
-                }
+            for (int _x = x + Dx, _y = y + Dy; !out_of_bound(_x, _y) && !A[_x][_y]; _x += Dx, _y += Dy) {
+                if (!~Queen_2[_x][_y]) { Q.push(Qnode(_x, _y, Queen_2[_x][_y] = d + 1)); }
             }
         }
     }
@@ -394,9 +359,7 @@ inline void calc_Liberty() {
         for (int j = 0; j < SIZE; j++) {
             for (int dir = 0; dir < 4; dir++) {
                 ti = i + dx[dir], tj = j + dy[dir];
-                if (!out_of_bound(ti, tj) && !A[ti][tj] && !A[i][j]) {
-                    L[i][j]++, L[ti][tj]++;
-                }
+                if (!out_of_bound(ti, tj) && !A[ti][tj] && !A[i][j]) { L[i][j]++, L[ti][tj]++; }
             }
         }
     }
@@ -414,8 +377,7 @@ inline double calc_M() {
         double m = 0.0;
         for (int dir = 0; dir < 8; dir++) {
             Dx = dx[dir], Dy = dy[dir];
-            for (int _x = x + Dx, _y = y + Dy, len = 1;
-                 !out_of_bound(_x, _y) && !A[_x][_y];
+            for (int _x = x + Dx, _y = y + Dy, len = 1; !out_of_bound(_x, _y) && !A[_x][_y];
                  _x += Dx, _y += Dy, len++) {
                 if (~Queen_2[_x][_y]) { m += pow(2, -len) * L[_x][_y]; }
             }
@@ -430,8 +392,7 @@ inline double calc_M() {
         double m = 0.0;
         for (int dir = 0; dir < 8; dir++) {
             Dx = dx[dir], Dy = dy[dir];
-            for (int _x = x + Dx, _y = y + Dy, len = 1;
-                 !out_of_bound(_x, _y) && !A[_x][_y];
+            for (int _x = x + Dx, _y = y + Dy, len = 1; !out_of_bound(_x, _y) && !A[_x][_y];
                  _x += Dx, _y += Dy, len++) {
                 if (~Queen_1[_x][_y]) { m += pow(2, -len) * L[_x][_y]; }
             }
@@ -554,8 +515,7 @@ inline double eval() {
     puts("\n");
 #endif
 
-    return sigmoid(sigma_1(omega) * Q + sigma_2(omega) * K +
-                   sigma_3(omega) * M);
+    return sigmoid(sigma_1(omega) * Q + sigma_2(omega) * K + sigma_3(omega) * M);
 }
 
 inline void expand(node *p) {
@@ -657,8 +617,7 @@ inline void json_test() {
     getline(cin, str);
     reader.parse(str, input);
     int x_0, y_0, x_1, y_1, x_2, y_2;
-    int role =
-        input["requests"][(Json::Value::UInt)0]["x0"].asInt() < 0 ? 1 : 2;
+    int role = input["requests"][(Json::Value::UInt)0]["x0"].asInt() < 0 ? 1 : 2;
     if (role == 2) {
         x_0 = input["requests"][(Json::Value::UInt)0]["x0"].asInt();
         y_0 = input["requests"][(Json::Value::UInt)0]["y0"].asInt();
@@ -735,14 +694,12 @@ inline void local_test() {
             int res = play();
             if (!~res) return;
             trans_policy(res, x_0, y_0, x_1, y_1, x_2, y_2);
-            fprintf(stderr, "%d %d %d %d %d %d    %.3lf\n", x_0, y_0, x_1, y_1,
-                    x_2, y_2,
+            fprintf(stderr, "%d %d %d %d %d %d    %.3lf\n", x_0, y_0, x_1, y_1, x_2, y_2,
                     (double)(clock() - T) / CLOCKS_PER_SEC);  // print();
         }
     } else {
         int x_0, y_0, x_1, y_1, x_2, y_2;
-        x_0 = read(), y_0 = read(), x_1 = read(), y_1 = read(), x_2 = read(),
-        y_2 = read();
+        x_0 = read(), y_0 = read(), x_1 = read(), y_1 = read(), x_2 = read(), y_2 = read();
         if (x_0 > 0) play(policy(x_0, y_0, x_1, y_1, x_2, y_2));
         trans_policy(play(), x_0, y_0, x_1, y_1, x_2, y_2);
         print();

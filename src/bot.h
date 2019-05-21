@@ -11,9 +11,9 @@ class Policy {
     Policy() {}
     Policy(int act_0, int act_1) : act_0(act_0), act_1(act_1) {}
 
-    bool operator<(const Policy &rhs) const {
-        return (act_0 < rhs.act_0) || (act_0 == rhs.act_0 && act_1 < rhs.act_1);
-    }
+    bool operator<(const Policy &rhs) const { return (act_0 < rhs.act_0) || (act_0 == rhs.act_0 && act_1 < rhs.act_1); }
+
+    bool operator==(const Policy &rhs) const { return act_0 == rhs.act_0 && act_1 == rhs.act_1; }
 
     bool empty() const { return act_0 == -2; }
 };
@@ -22,7 +22,7 @@ class Policy {
 class Node {
    public:
     int vis, size;
-    double val;
+    std::pair<double, double> val;
     Node *fa, *bstCh;
     std::map<std::pair<Policy, Policy>, Node *> ch;
     int dep;
@@ -31,14 +31,7 @@ class Node {
     bool full;
 
     Node(const std::pair<Policy, Policy> pol, Node *fa = nullptr)
-        : vis(0),
-          size(1),
-          val(0.0),
-          fa(fa),
-          bstCh(nullptr),
-          dep(fa ? fa->dep + 1 : 0),
-          pol(pol),
-          full(false) {}
+        : vis(0), size(1), val(0.0, 0.0), fa(fa), bstCh(nullptr), dep(fa ? fa->dep + 1 : 0), pol(pol), full(false) {}
 
     ~Node() {
         for (auto &p : ch) delete p.second;
@@ -50,9 +43,7 @@ class Node {
         return size;
     }
 
-    Node *NewChild(const std::pair<Policy, Policy> &pol) {
-        return ch[pol] = new Node(pol, this);
-    }
+    Node *NewChild(const std::pair<Policy, Policy> &pol) { return ch[pol] = new Node(pol, this); }
 
     void DelFather() {
         fa->ch[pol] = nullptr;
@@ -63,22 +54,36 @@ class Node {
 
 class Bot {
    public:
-    const double C;
+    TankGame::TankField state;
+    // parameter
+    const double TIME_LIMIT;
+    const double C, dist_c, rule_c, shoot_c, noteff_shoot_c, self_kill_c;
+    const int rollOut;
     const int TRAIN_UNIT = 100;
 
     // notice that the policy is in [-1,7], so we should +1 in the following
     double val[9][9][2];
     int vis[9][9][2];
-
     unsigned long long timing;
-
-    const double TIME_LIMIT;
-
     Node *root;
-    TankGame::TankField state;
 
-    Bot(const TankGame::TankField &s, double C)
-        : state(s), TIME_LIMIT(0.8), C(C) {
+    Bot(const TankGame::TankField &s,
+        double C = 0.9,
+        double dist_c = 0.1,
+        double rule_c = 0.2,
+        double shoot_c = 0.2,
+        double noteff_shoot_c = 0.2,
+        double self_kill_c = 0.2,
+        int rollOut = 5)
+        : state(s),
+          TIME_LIMIT(0.9),
+          C(C),
+          dist_c(dist_c),
+          rule_c(rule_c),
+          shoot_c(shoot_c),
+          noteff_shoot_c(noteff_shoot_c),
+          self_kill_c(self_kill_c),
+          rollOut(rollOut) {
         root = new Node(std::make_pair(Policy(-2, -2), Policy(-2, -2)));
     }
     ~Bot() { delete root; }
@@ -91,9 +96,7 @@ class Bot {
 
     Node *RandomMove(Node *);
 
-    double Utility(TankGame::GameResult);
-
-    void BackPropagation(Node *, double);
+    void BackPropagation(Node *, const std::pair<double, double> &);
 
     void RollOut(Node *);
 
@@ -104,6 +107,10 @@ class Bot {
     Policy GenDecision(bool);
 
     void Play(const std::pair<Policy, Policy> &);
+
+    std::pair<double, double> Eval(Node *, TankGame::TankField &s);
+
+    std::pair<double, double> Penalty(Node *, TankGame::TankField &s);
 };
 
 #endif

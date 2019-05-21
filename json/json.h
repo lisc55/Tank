@@ -9,9 +9,8 @@
 #define JSONCPP_VERSION_MINOR 7
 #define JSONCPP_VERSION_PATCH 0
 #define JSONCPP_VERSION_QUALIFIER
-#define JSONCPP_VERSION_HEXA                                                   \
-    ((JSONCPP_VERSION_MAJOR << 24) | (JSONCPP_VERSION_MINOR << 16) |           \
-     (JSONCPP_VERSION_PATCH << 8))
+#define JSONCPP_VERSION_HEXA                                                                                           \
+    ((JSONCPP_VERSION_MAJOR << 24) | (JSONCPP_VERSION_MINOR << 16) | (JSONCPP_VERSION_PATCH << 8))
 
 #endif
 #ifndef JSON_CONFIG_H_INCLUDED
@@ -181,16 +180,7 @@ class JSON_API Features {
 
 namespace Json {
 
-enum ValueType {
-    nullValue = 0,
-    intValue,
-    uintValue,
-    realValue,
-    stringValue,
-    booleanValue,
-    arrayValue,
-    objectValue
-};
+enum ValueType { nullValue = 0, intValue, uintValue, realValue, stringValue, booleanValue, arrayValue, objectValue };
 
 enum CommentPlacement {
     commentBefore = 0,
@@ -262,11 +252,7 @@ class JSON_API Value {
 
     class CZString {
        public:
-        enum DuplicationPolicy {
-            noDuplication = 0,
-            duplicate,
-            duplicateOnCopy
-        };
+        enum DuplicationPolicy { noDuplication = 0, duplicate, duplicateOnCopy };
 
         CZString(ArrayIndex index);
 
@@ -512,15 +498,11 @@ class JSON_API Value {
 #ifdef JSON_VALUE_USE_INTERNAL_MAP
     inline bool isItemAvailable() const { return itemIsUsed_ == 0; }
 
-    inline void setItemUsed(bool isUsed = true) {
-        itemIsUsed_ = isUsed ? 1 : 0;
-    }
+    inline void setItemUsed(bool isUsed = true) { itemIsUsed_ = isUsed ? 1 : 0; }
 
     inline bool isMemberNameStatic() const { return memberNameIsStatic_ == 0; }
 
-    inline void setMemberNameIsStatic(bool isStatic) {
-        memberNameIsStatic_ = isStatic ? 1 : 0;
-    }
+    inline void setMemberNameIsStatic(bool isStatic) { memberNameIsStatic_ = isStatic ? 1 : 0; }
 #endif
 
    private:
@@ -679,16 +661,11 @@ class JSON_API ValueInternalMap {
 
     void remove(const char *key);
 
-    void doActualRemove(ValueInternalLink *link,
-                        BucketIndex index,
-                        BucketIndex bucketIndex);
+    void doActualRemove(ValueInternalLink *link, BucketIndex index, BucketIndex bucketIndex);
 
     ValueInternalLink *&getLastLinkInBucket(BucketIndex bucketIndex);
 
-    Value &setNewItem(const char *key,
-                      bool isStatic,
-                      ValueInternalLink *link,
-                      BucketIndex index);
+    Value &setNewItem(const char *key, bool isStatic, ValueInternalLink *link, BucketIndex index);
 
     Value &unsafeAdd(const char *key, bool isStatic, HashKey hashedKey);
 
@@ -726,8 +703,7 @@ class JSON_API ValueInternalArray {
 
 #ifndef JSONCPP_DOC_EXCLUDE_IMPLEMENTATION
     struct IteratorState {
-        IteratorState()
-            : array_(0), currentPageIndex_(0), currentItemIndex_(0) {}
+        IteratorState() : array_(0), currentPageIndex_(0), currentItemIndex_(0) {}
         ValueInternalArray *array_;
         Value **currentPageIndex_;
         unsigned int currentItemIndex_;
@@ -774,17 +750,13 @@ class JSON_API ValueArrayAllocator {
    public:
     virtual ~ValueArrayAllocator();
     virtual ValueInternalArray *newArray() = 0;
-    virtual ValueInternalArray *newArrayCopy(
-        const ValueInternalArray &other) = 0;
+    virtual ValueInternalArray *newArrayCopy(const ValueInternalArray &other) = 0;
     virtual void destructArray(ValueInternalArray *array) = 0;
 
-    virtual void reallocateArrayPageIndex(
-        Value **&indexes,
-        ValueInternalArray::PageIndex &indexCount,
-        ValueInternalArray::PageIndex minNewIndexCount) = 0;
-    virtual void releaseArrayPageIndex(
-        Value **indexes,
-        ValueInternalArray::PageIndex indexCount) = 0;
+    virtual void reallocateArrayPageIndex(Value **&indexes,
+                                          ValueInternalArray::PageIndex &indexCount,
+                                          ValueInternalArray::PageIndex minNewIndexCount) = 0;
+    virtual void releaseArrayPageIndex(Value **indexes, ValueInternalArray::PageIndex indexCount) = 0;
     virtual Value *allocateArrayPage() = 0;
     virtual void releaseArrayPage(Value *value) = 0;
 };
@@ -812,9 +784,7 @@ class JSON_API ValueIteratorBase {
 
     bool operator!=(const SelfType &other) const { return !isEqual(other); }
 
-    difference_type operator-(const SelfType &other) const {
-        return computeDistance(other);
-    }
+    difference_type operator-(const SelfType &other) const { return computeDistance(other); }
 
     Value key() const;
 
@@ -1000,14 +970,9 @@ class JSON_API Reader {
 
     Reader(const Features &features);
 
-    bool parse(const std::string &document,
-               Value &root,
-               bool collectComments = true);
+    bool parse(const std::string &document, Value &root, bool collectComments = true);
 
-    bool parse(const char *beginDoc,
-               const char *endDoc,
-               Value &root,
-               bool collectComments = true);
+    bool parse(const char *beginDoc, const char *endDoc, Value &root, bool collectComments = true);
 
     bool parse(std::istream &is, Value &root, bool collectComments = true);
 
@@ -1089,23 +1054,15 @@ class JSON_API Reader {
 
     bool decodeDouble(Token &token, Value &decoded);
 
-    bool decodeUnicodeCodePoint(Token &token,
-                                Location &current,
-                                Location end,
-                                unsigned int &unicode);
+    bool decodeUnicodeCodePoint(Token &token, Location &current, Location end, unsigned int &unicode);
 
-    bool decodeUnicodeEscapeSequence(Token &token,
-                                     Location &current,
-                                     Location end,
-                                     unsigned int &unicode);
+    bool decodeUnicodeEscapeSequence(Token &token, Location &current, Location end, unsigned int &unicode);
 
     bool addError(const std::string &message, Token &token, Location extra = 0);
 
     bool recoverFromError(TokenType skipUntilToken);
 
-    bool addErrorAndRecover(const std::string &message,
-                            Token &token,
-                            TokenType skipUntilToken);
+    bool addErrorAndRecover(const std::string &message, Token &token, TokenType skipUntilToken);
 
     void skipUntilSpace();
 
@@ -1113,9 +1070,7 @@ class JSON_API Reader {
 
     Char getNextChar();
 
-    void getLocationLineAndColumn(Location location,
-                                  int &line,
-                                  int &column) const;
+    void getLocationLineAndColumn(Location location, int &line, int &column) const;
 
     std::string getLocationLineAndColumn(Location location) const;
 
@@ -1331,16 +1286,16 @@ JSON_API std::ostream &operator<<(std::ostream &, const Value &root);
 #else
 #define JSON_ASSERT(condition) assert(condition);
 
-#define JSON_FAIL_MESSAGE(message)                                             \
-    {                                                                          \
-        assert(false && message);                                              \
-        strcpy(reinterpret_cast<char *>(666), message);                        \
-        exit(123);                                                             \
+#define JSON_FAIL_MESSAGE(message)                                                                                     \
+    {                                                                                                                  \
+        assert(false && message);                                                                                      \
+        strcpy(reinterpret_cast<char *>(666), message);                                                                \
+        exit(123);                                                                                                     \
     }
 
 #endif
 
-#define JSON_ASSERT_MESSAGE(condition, message)                                \
+#define JSON_ASSERT_MESSAGE(condition, message)                                                                        \
     if (!(condition)) { JSON_FAIL_MESSAGE(message) }
 
 #endif

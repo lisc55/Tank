@@ -9,9 +9,8 @@
 #define JSONCPP_VERSION_MINOR 7
 #define JSONCPP_VERSION_PATCH 0
 #define JSONCPP_VERSION_QUALIFIER
-#define JSONCPP_VERSION_HEXA                                                   \
-    ((JSONCPP_VERSION_MAJOR << 24) | (JSONCPP_VERSION_MINOR << 16) |           \
-     (JSONCPP_VERSION_PATCH << 8))
+#define JSONCPP_VERSION_HEXA                                                                                           \
+    ((JSONCPP_VERSION_MAJOR << 24) | (JSONCPP_VERSION_MINOR << 16) | (JSONCPP_VERSION_PATCH << 8))
 
 #endif
 #ifndef JSON_CONFIG_H_INCLUDED
@@ -178,16 +177,7 @@ class JSON_API Features {
 
 namespace Json {
 
-enum ValueType {
-    nullValue = 0,
-    intValue,
-    uintValue,
-    realValue,
-    stringValue,
-    booleanValue,
-    arrayValue,
-    objectValue
-};
+enum ValueType { nullValue = 0, intValue, uintValue, realValue, stringValue, booleanValue, arrayValue, objectValue };
 
 enum CommentPlacement {
     commentBefore = 0,
@@ -259,11 +249,7 @@ class JSON_API Value {
 
     class CZString {
        public:
-        enum DuplicationPolicy {
-            noDuplication = 0,
-            duplicate,
-            duplicateOnCopy
-        };
+        enum DuplicationPolicy { noDuplication = 0, duplicate, duplicateOnCopy };
 
         CZString(ArrayIndex index);
 
@@ -509,15 +495,11 @@ class JSON_API Value {
 #ifdef JSON_VALUE_USE_INTERNAL_MAP
     inline bool isItemAvailable() const { return itemIsUsed_ == 0; }
 
-    inline void setItemUsed(bool isUsed = true) {
-        itemIsUsed_ = isUsed ? 1 : 0;
-    }
+    inline void setItemUsed(bool isUsed = true) { itemIsUsed_ = isUsed ? 1 : 0; }
 
     inline bool isMemberNameStatic() const { return memberNameIsStatic_ == 0; }
 
-    inline void setMemberNameIsStatic(bool isStatic) {
-        memberNameIsStatic_ = isStatic ? 1 : 0;
-    }
+    inline void setMemberNameIsStatic(bool isStatic) { memberNameIsStatic_ = isStatic ? 1 : 0; }
 #endif
 
    private:
@@ -676,16 +658,11 @@ class JSON_API ValueInternalMap {
 
     void remove(const char *key);
 
-    void doActualRemove(ValueInternalLink *link,
-                        BucketIndex index,
-                        BucketIndex bucketIndex);
+    void doActualRemove(ValueInternalLink *link, BucketIndex index, BucketIndex bucketIndex);
 
     ValueInternalLink *&getLastLinkInBucket(BucketIndex bucketIndex);
 
-    Value &setNewItem(const char *key,
-                      bool isStatic,
-                      ValueInternalLink *link,
-                      BucketIndex index);
+    Value &setNewItem(const char *key, bool isStatic, ValueInternalLink *link, BucketIndex index);
 
     Value &unsafeAdd(const char *key, bool isStatic, HashKey hashedKey);
 
@@ -723,8 +700,7 @@ class JSON_API ValueInternalArray {
 
 #ifndef JSONCPP_DOC_EXCLUDE_IMPLEMENTATION
     struct IteratorState {
-        IteratorState()
-            : array_(0), currentPageIndex_(0), currentItemIndex_(0) {}
+        IteratorState() : array_(0), currentPageIndex_(0), currentItemIndex_(0) {}
         ValueInternalArray *array_;
         Value **currentPageIndex_;
         unsigned int currentItemIndex_;
@@ -771,17 +747,13 @@ class JSON_API ValueArrayAllocator {
    public:
     virtual ~ValueArrayAllocator();
     virtual ValueInternalArray *newArray() = 0;
-    virtual ValueInternalArray *newArrayCopy(
-        const ValueInternalArray &other) = 0;
+    virtual ValueInternalArray *newArrayCopy(const ValueInternalArray &other) = 0;
     virtual void destructArray(ValueInternalArray *array) = 0;
 
-    virtual void reallocateArrayPageIndex(
-        Value **&indexes,
-        ValueInternalArray::PageIndex &indexCount,
-        ValueInternalArray::PageIndex minNewIndexCount) = 0;
-    virtual void releaseArrayPageIndex(
-        Value **indexes,
-        ValueInternalArray::PageIndex indexCount) = 0;
+    virtual void reallocateArrayPageIndex(Value **&indexes,
+                                          ValueInternalArray::PageIndex &indexCount,
+                                          ValueInternalArray::PageIndex minNewIndexCount) = 0;
+    virtual void releaseArrayPageIndex(Value **indexes, ValueInternalArray::PageIndex indexCount) = 0;
     virtual Value *allocateArrayPage() = 0;
     virtual void releaseArrayPage(Value *value) = 0;
 };
@@ -809,9 +781,7 @@ class JSON_API ValueIteratorBase {
 
     bool operator!=(const SelfType &other) const { return !isEqual(other); }
 
-    difference_type operator-(const SelfType &other) const {
-        return computeDistance(other);
-    }
+    difference_type operator-(const SelfType &other) const { return computeDistance(other); }
 
     Value key() const;
 
@@ -996,14 +966,9 @@ class JSON_API Reader {
 
     Reader(const Features &features);
 
-    bool parse(const std::string &document,
-               Value &root,
-               bool collectComments = true);
+    bool parse(const std::string &document, Value &root, bool collectComments = true);
 
-    bool parse(const char *beginDoc,
-               const char *endDoc,
-               Value &root,
-               bool collectComments = true);
+    bool parse(const char *beginDoc, const char *endDoc, Value &root, bool collectComments = true);
 
     bool parse(std::istream &is, Value &root, bool collectComments = true);
 
@@ -1085,23 +1050,15 @@ class JSON_API Reader {
 
     bool decodeDouble(Token &token, Value &decoded);
 
-    bool decodeUnicodeCodePoint(Token &token,
-                                Location &current,
-                                Location end,
-                                unsigned int &unicode);
+    bool decodeUnicodeCodePoint(Token &token, Location &current, Location end, unsigned int &unicode);
 
-    bool decodeUnicodeEscapeSequence(Token &token,
-                                     Location &current,
-                                     Location end,
-                                     unsigned int &unicode);
+    bool decodeUnicodeEscapeSequence(Token &token, Location &current, Location end, unsigned int &unicode);
 
     bool addError(const std::string &message, Token &token, Location extra = 0);
 
     bool recoverFromError(TokenType skipUntilToken);
 
-    bool addErrorAndRecover(const std::string &message,
-                            Token &token,
-                            TokenType skipUntilToken);
+    bool addErrorAndRecover(const std::string &message, Token &token, TokenType skipUntilToken);
 
     void skipUntilSpace();
 
@@ -1109,9 +1066,7 @@ class JSON_API Reader {
 
     Char getNextChar();
 
-    void getLocationLineAndColumn(Location location,
-                                  int &line,
-                                  int &column) const;
+    void getLocationLineAndColumn(Location location, int &line, int &column) const;
 
     std::string getLocationLineAndColumn(Location location) const;
 
@@ -1325,16 +1280,16 @@ JSON_API std::ostream &operator<<(std::ostream &, const Value &root);
 #else
 #define JSON_ASSERT(condition) assert(condition);
 
-#define JSON_FAIL_MESSAGE(message)                                             \
-    {                                                                          \
-        assert(false && message);                                              \
-        strcpy(reinterpret_cast<char *>(666), message);                        \
-        exit(123);                                                             \
+#define JSON_FAIL_MESSAGE(message)                                                                                     \
+    {                                                                                                                  \
+        assert(false && message);                                                                                      \
+        strcpy(reinterpret_cast<char *>(666), message);                                                                \
+        exit(123);                                                                                                     \
     }
 
 #endif
 
-#define JSON_ASSERT_MESSAGE(condition, message)                                \
+#define JSON_ASSERT_MESSAGE(condition, message)                                                                        \
     if (!(condition)) { JSON_FAIL_MESSAGE(message) }
 
 #endif
@@ -1537,10 +1492,7 @@ static inline void fixNumericLocale(char *begin, char *end) {
 namespace Json {
 
 Features::Features()
-    : allowComments_(true),
-      strictRoot_(false),
-      allowDroppedNullPlaceholders_(false),
-      allowNumericKeys_(false) {}
+    : allowComments_(true), strictRoot_(false), allowDroppedNullPlaceholders_(false), allowNumericKeys_(false) {}
 
 Features Features::all() { return Features(); }
 
@@ -1553,11 +1505,7 @@ Features Features::strictMode() {
     return features;
 }
 
-static inline bool in(Reader::Char c,
-                      Reader::Char c1,
-                      Reader::Char c2,
-                      Reader::Char c3,
-                      Reader::Char c4) {
+static inline bool in(Reader::Char c, Reader::Char c1, Reader::Char c2, Reader::Char c3, Reader::Char c4) {
     return c == c1 || c == c2 || c == c3 || c == c4;
 }
 
@@ -1600,9 +1548,7 @@ Reader::Reader(const Features &features)
       features_(features),
       collectComments_() {}
 
-bool Reader::parse(const std::string &document,
-                   Value &root,
-                   bool collectComments) {
+bool Reader::parse(const std::string &document, Value &root, bool collectComments) {
     document_ = document;
     const char *begin = document_.c_str();
     const char *end = begin + document_.length();
@@ -1615,10 +1561,7 @@ bool Reader::parse(std::istream &sin, Value &root, bool collectComments) {
     return parse(doc, root, collectComments);
 }
 
-bool Reader::parse(const char *beginDoc,
-                   const char *endDoc,
-                   Value &root,
-                   bool collectComments) {
+bool Reader::parse(const char *beginDoc, const char *endDoc, Value &root, bool collectComments) {
     if (!features_.allowComments_) { collectComments = false; }
 
     begin_ = beginDoc;
@@ -1635,8 +1578,7 @@ bool Reader::parse(const char *beginDoc,
     bool successful = readValue();
     Token token;
     skipCommentTokens(token);
-    if (collectComments_ && !commentsBefore_.empty())
-        root.setComment(commentsBefore_, commentAfter);
+    if (collectComments_ && !commentsBefore_.empty()) root.setComment(commentsBefore_, commentAfter);
     if (features_.strictRoot_) {
         if (!root.isArray() && !root.isObject()) {
             token.type_ = tokenError;
@@ -1711,8 +1653,7 @@ bool Reader::readValue() {
         default:
             currentValue().setOffsetStart(token.start_ - begin_);
             currentValue().setOffsetLimit(token.end_ - begin_);
-            return addError("Syntax error: value, object or array expected.",
-                            token);
+            return addError("Syntax error: value, object or array expected.", token);
     }
 
     if (collectComments_) {
@@ -1839,8 +1780,7 @@ bool Reader::readComment() {
     if (collectComments_) {
         CommentPlacement placement = commentBefore;
         if (lastValueEnd_ && !containsNewLine(lastValueEnd_, commentBegin)) {
-            if (c != '*' || !containsNewLine(commentBegin, current_))
-                placement = commentAfterOnSameLine;
+            if (c != '*' || !containsNewLine(commentBegin, current_)) placement = commentAfterOnSameLine;
         }
 
         addComment(commentBegin, current_, placement);
@@ -1848,9 +1788,7 @@ bool Reader::readComment() {
     return true;
 }
 
-void Reader::addComment(Location begin,
-                        Location end,
-                        CommentPlacement placement) {
+void Reader::addComment(Location begin, Location end, CommentPlacement placement) {
     assert(collectComments_);
     if (placement == commentAfterOnSameLine) {
         assert(lastValue_ != 0);
@@ -1878,9 +1816,7 @@ bool Reader::readCppStyleComment() {
 
 void Reader::readNumber() {
     while (current_ != end_) {
-        if (!(*current_ >= '0' && *current_ <= '9') &&
-            !in(*current_, '.', 'e', 'E', '+', '-'))
-            break;
+        if (!(*current_ >= '0' && *current_ <= '9') && !in(*current_, '.', 'e', 'E', '+', '-')) break;
         ++current_;
     }
 }
@@ -1904,19 +1840,15 @@ bool Reader::readObject(Token &tokenStart) {
     currentValue().setOffsetStart(tokenStart.start_ - begin_);
     while (readToken(tokenName)) {
         bool initialTokenOk = true;
-        while (tokenName.type_ == tokenComment && initialTokenOk)
-            initialTokenOk = readToken(tokenName);
+        while (tokenName.type_ == tokenComment && initialTokenOk) initialTokenOk = readToken(tokenName);
         if (!initialTokenOk) break;
         if (tokenName.type_ == tokenObjectEnd && name.empty()) return true;
         name = "";
         if (tokenName.type_ == tokenString) {
-            if (!decodeString(tokenName, name))
-                return recoverFromError(tokenObjectEnd);
-        } else if (tokenName.type_ == tokenNumber &&
-                   features_.allowNumericKeys_) {
+            if (!decodeString(tokenName, name)) return recoverFromError(tokenObjectEnd);
+        } else if (tokenName.type_ == tokenNumber && features_.allowNumericKeys_) {
             Value numberName;
-            if (!decodeNumber(tokenName, numberName))
-                return recoverFromError(tokenObjectEnd);
+            if (!decodeNumber(tokenName, numberName)) return recoverFromError(tokenObjectEnd);
             name = numberName.asString();
         } else {
             break;
@@ -1924,8 +1856,7 @@ bool Reader::readObject(Token &tokenStart) {
 
         Token colon;
         if (!readToken(colon) || colon.type_ != tokenMemberSeparator) {
-            return addErrorAndRecover("Missing ':' after object member name",
-                                      colon, tokenObjectEnd);
+            return addErrorAndRecover("Missing ':' after object member name", colon, tokenObjectEnd);
         }
         Value &value = currentValue()[name];
         nodes_.push(&value);
@@ -1934,20 +1865,15 @@ bool Reader::readObject(Token &tokenStart) {
         if (!ok) return recoverFromError(tokenObjectEnd);
 
         Token comma;
-        if (!readToken(comma) || (comma.type_ != tokenObjectEnd &&
-                                  comma.type_ != tokenArraySeparator &&
-                                  comma.type_ != tokenComment)) {
-            return addErrorAndRecover(
-                "Missing ',' or '}' in object declaration", comma,
-                tokenObjectEnd);
+        if (!readToken(comma) ||
+            (comma.type_ != tokenObjectEnd && comma.type_ != tokenArraySeparator && comma.type_ != tokenComment)) {
+            return addErrorAndRecover("Missing ',' or '}' in object declaration", comma, tokenObjectEnd);
         }
         bool finalizeTokenOk = true;
-        while (comma.type_ == tokenComment && finalizeTokenOk)
-            finalizeTokenOk = readToken(comma);
+        while (comma.type_ == tokenComment && finalizeTokenOk) finalizeTokenOk = readToken(comma);
         if (comma.type_ == tokenObjectEnd) return true;
     }
-    return addErrorAndRecover("Missing '}' or object member name", tokenName,
-                              tokenObjectEnd);
+    return addErrorAndRecover("Missing '}' or object member name", tokenName, tokenObjectEnd);
 }
 
 bool Reader::readArray(Token &tokenStart) {
@@ -1971,11 +1897,9 @@ bool Reader::readArray(Token &tokenStart) {
 
         ok = readToken(token);
         while (token.type_ == tokenComment && ok) { ok = readToken(token); }
-        bool badTokenType = (token.type_ != tokenArraySeparator &&
-                             token.type_ != tokenArrayEnd);
+        bool badTokenType = (token.type_ != tokenArraySeparator && token.type_ != tokenArrayEnd);
         if (!ok || badTokenType) {
-            return addErrorAndRecover("Missing ',' or ']' in array declaration",
-                                      token, tokenArrayEnd);
+            return addErrorAndRecover("Missing ',' or ']' in array declaration", token, tokenArrayEnd);
         }
         if (token.type_ == tokenArrayEnd) break;
     }
@@ -1994,29 +1918,23 @@ bool Reader::decodeNumber(Token &token) {
 bool Reader::decodeNumber(Token &token, Value &decoded) {
     bool isDouble = false;
     for (Location inspect = token.start_; inspect != token.end_; ++inspect) {
-        isDouble = isDouble || in(*inspect, '.', 'e', 'E', '+') ||
-                   (*inspect == '-' && inspect != token.start_);
+        isDouble = isDouble || in(*inspect, '.', 'e', 'E', '+') || (*inspect == '-' && inspect != token.start_);
     }
     if (isDouble) return decodeDouble(token, decoded);
 
     Location current = token.start_;
     bool isNegative = *current == '-';
     if (isNegative) ++current;
-    Value::LargestUInt maxIntegerValue =
-        isNegative ? Value::LargestUInt(-Value::minLargestInt) :
-                     Value::maxLargestUInt;
+    Value::LargestUInt maxIntegerValue = isNegative ? Value::LargestUInt(-Value::minLargestInt) : Value::maxLargestUInt;
     Value::LargestUInt threshold = maxIntegerValue / 10;
     Value::LargestUInt value = 0;
     while (current < token.end_) {
         Char c = *current++;
         if (c < '0' || c > '9')
-            return addError("'" + std::string(token.start_, token.end_) +
-                                "' is not a number.",
-                            token);
+            return addError("'" + std::string(token.start_, token.end_) + "' is not a number.", token);
         Value::UInt digit(c - '0');
         if (value >= threshold) {
-            if (value > threshold || current != token.end_ ||
-                digit > maxIntegerValue % 10) {
+            if (value > threshold || current != token.end_ || digit > maxIntegerValue % 10) {
                 return decodeDouble(token, decoded);
             }
         }
@@ -2060,10 +1978,7 @@ bool Reader::decodeDouble(Token &token, Value &decoded) {
         count = sscanf(buffer.c_str(), format, &value);
     }
 
-    if (count != 1)
-        return addError(
-            "'" + std::string(token.start_, token.end_) + "' is not a number.",
-            token);
+    if (count != 1) return addError("'" + std::string(token.start_, token.end_) + "' is not a number.", token);
     decoded = value;
     return true;
 }
@@ -2086,9 +2001,7 @@ bool Reader::decodeString(Token &token, std::string &decoded) {
         if (c == '"')
             break;
         else if (c == '\\') {
-            if (current == end)
-                return addError("Empty escape sequence in string", token,
-                                current);
+            if (current == end) return addError("Empty escape sequence in string", token, current);
             Char escape = *current++;
             switch (escape) {
                 case '"':
@@ -2117,13 +2030,11 @@ bool Reader::decodeString(Token &token, std::string &decoded) {
                     break;
                 case 'u': {
                     unsigned int unicode;
-                    if (!decodeUnicodeCodePoint(token, current, end, unicode))
-                        return false;
+                    if (!decodeUnicodeCodePoint(token, current, end, unicode)) return false;
                     decoded += codePointToUTF8(unicode);
                 } break;
                 default:
-                    return addError("Bad escape sequence in string", token,
-                                    current);
+                    return addError("Bad escape sequence in string", token, current);
             }
         } else {
             decoded += c;
@@ -2132,12 +2043,8 @@ bool Reader::decodeString(Token &token, std::string &decoded) {
     return true;
 }
 
-bool Reader::decodeUnicodeCodePoint(Token &token,
-                                    Location &current,
-                                    Location end,
-                                    unsigned int &unicode) {
-    if (!decodeUnicodeEscapeSequence(token, current, end, unicode))
-        return false;
+bool Reader::decodeUnicodeCodePoint(Token &token, Location &current, Location end, unsigned int &unicode) {
+    if (!decodeUnicodeEscapeSequence(token, current, end, unicode)) return false;
     if (unicode >= 0xD800 && unicode <= 0xDBFF) {
         if (end - current < 6)
             return addError(
@@ -2146,10 +2053,8 @@ bool Reader::decodeUnicodeCodePoint(Token &token,
                 token, current);
         unsigned int surrogatePair;
         if (*(current++) == '\\' && *(current++) == 'u') {
-            if (decodeUnicodeEscapeSequence(token, current, end,
-                                            surrogatePair)) {
-                unicode = 0x10000 + ((unicode & 0x3FF) << 10) +
-                          (surrogatePair & 0x3FF);
+            if (decodeUnicodeEscapeSequence(token, current, end, surrogatePair)) {
+                unicode = 0x10000 + ((unicode & 0x3FF) << 10) + (surrogatePair & 0x3FF);
             } else
                 return false;
         } else
@@ -2161,14 +2066,9 @@ bool Reader::decodeUnicodeCodePoint(Token &token,
     return true;
 }
 
-bool Reader::decodeUnicodeEscapeSequence(Token &token,
-                                         Location &current,
-                                         Location end,
-                                         unsigned int &unicode) {
+bool Reader::decodeUnicodeEscapeSequence(Token &token, Location &current, Location end, unsigned int &unicode) {
     if (end - current < 4)
-        return addError(
-            "Bad unicode escape sequence in string: four digits expected.",
-            token, current);
+        return addError("Bad unicode escape sequence in string: four digits expected.", token, current);
     unicode = 0;
     for (int index = 0; index < 4; ++index) {
         Char c = *current++;
@@ -2188,9 +2088,7 @@ bool Reader::decodeUnicodeEscapeSequence(Token &token,
     return true;
 }
 
-bool Reader::addError(const std::string &message,
-                      Token &token,
-                      Location extra) {
+bool Reader::addError(const std::string &message, Token &token, Location extra) {
     ErrorInfo info;
     info.token_ = token;
     info.message_ = message;
@@ -2204,16 +2102,13 @@ bool Reader::recoverFromError(TokenType skipUntilToken) {
     Token skip;
     for (;;) {
         if (!readToken(skip)) errors_.resize(errorCount);
-        if (skip.type_ == skipUntilToken || skip.type_ == tokenEndOfStream)
-            break;
+        if (skip.type_ == skipUntilToken || skip.type_ == tokenEndOfStream) break;
     }
     errors_.resize(errorCount);
     return false;
 }
 
-bool Reader::addErrorAndRecover(const std::string &message,
-                                Token &token,
-                                TokenType skipUntilToken) {
+bool Reader::addErrorAndRecover(const std::string &message, Token &token, TokenType skipUntilToken) {
     addError(message, token);
     return recoverFromError(skipUntilToken);
 }
@@ -2225,9 +2120,7 @@ Reader::Char Reader::getNextChar() {
     return *current_++;
 }
 
-void Reader::getLocationLineAndColumn(Location location,
-                                      int &line,
-                                      int &column) const {
+void Reader::getLocationLineAndColumn(Location location, int &line, int &column) const {
     Location current = begin_;
     Location lastLineStart = current;
     line = 0;
@@ -2263,30 +2156,22 @@ std::string Reader::getLocationLineAndColumn(Location location) const {
     return buffer;
 }
 
-std::string Reader::getFormatedErrorMessages() const {
-    return getFormattedErrorMessages();
-}
+std::string Reader::getFormatedErrorMessages() const { return getFormattedErrorMessages(); }
 
 std::string Reader::getFormattedErrorMessages() const {
     std::string formattedMessage;
-    for (Errors::const_iterator itError = errors_.begin();
-         itError != errors_.end(); ++itError) {
+    for (Errors::const_iterator itError = errors_.begin(); itError != errors_.end(); ++itError) {
         const ErrorInfo &error = *itError;
-        formattedMessage +=
-            "* " + getLocationLineAndColumn(error.token_.start_) + "\n";
+        formattedMessage += "* " + getLocationLineAndColumn(error.token_.start_) + "\n";
         formattedMessage += "  " + error.message_ + "\n";
-        if (error.extra_)
-            formattedMessage += "See " +
-                                getLocationLineAndColumn(error.extra_) +
-                                " for detail.\n";
+        if (error.extra_) formattedMessage += "See " + getLocationLineAndColumn(error.extra_) + " for detail.\n";
     }
     return formattedMessage;
 }
 
 std::vector<Reader::StructuredError> Reader::getStructuredErrors() const {
     std::vector<Reader::StructuredError> allErrors;
-    for (Errors::const_iterator itError = errors_.begin();
-         itError != errors_.end(); ++itError) {
+    for (Errors::const_iterator itError = errors_.begin(); itError != errors_.end(); ++itError) {
         const ErrorInfo &error = *itError;
         Reader::StructuredError structured;
         structured.offset_start = error.token_.start_ - begin_;
@@ -2301,8 +2186,7 @@ std::istream &operator>>(std::istream &sin, Value &root) {
     Json::Reader reader;
     bool ok = reader.parse(sin, root, true);
     if (!ok) {
-        fprintf(stderr, "Error from reader: %s",
-                reader.getFormattedErrorMessages().c_str());
+        fprintf(stderr, "Error from reader: %s", reader.getFormattedErrorMessages().c_str());
 
         JSON_FAIL_MESSAGE("reader error");
     }
@@ -2324,10 +2208,8 @@ namespace Json {
 template <typename AllocatedType, const unsigned int objectPerAllocation>
 class BatchAllocator {
    public:
-    BatchAllocator(unsigned int objectsPerPage = 255)
-        : freeHead_(0), objectsPerPage_(objectsPerPage) {
-        assert(sizeof(AllocatedType) * objectPerAllocation >=
-               sizeof(AllocatedType *));
+    BatchAllocator(unsigned int objectsPerPage = 255) : freeHead_(0), objectsPerPage_(objectsPerPage) {
+        assert(sizeof(AllocatedType) * objectPerAllocation >= sizeof(AllocatedType *));
 
         assert(objectsPerPage >= 16);
         batches_ = allocateBatch(0);
@@ -2350,8 +2232,7 @@ class BatchAllocator {
         }
         if (currentBatch_->used_ == currentBatch_->end_) {
             currentBatch_ = currentBatch_->next_;
-            while (currentBatch_ && currentBatch_->used_ == currentBatch_->end_)
-                currentBatch_ = currentBatch_->next_;
+            while (currentBatch_ && currentBatch_->used_ == currentBatch_->end_) currentBatch_ = currentBatch_->next_;
 
             if (!currentBatch_) {
                 currentBatch_ = allocateBatch(objectsPerPage_);
@@ -2383,9 +2264,8 @@ class BatchAllocator {
     void operator=(const BatchAllocator &);
 
     static BatchInfo *allocateBatch(unsigned int objectsPerPage) {
-        const unsigned int mallocSize =
-            sizeof(BatchInfo) - sizeof(AllocatedType) * objectPerAllocation +
-            sizeof(AllocatedType) * objectPerAllocation * objectsPerPage;
+        const unsigned int mallocSize = sizeof(BatchInfo) - sizeof(AllocatedType) * objectPerAllocation +
+                                        sizeof(AllocatedType) * objectPerAllocation * objectsPerPage;
         BatchInfo *batch = static_cast<BatchInfo *>(malloc(mallocSize));
         batch->next_ = 0;
         batch->used_ = batch->buffer_;
@@ -2421,20 +2301,15 @@ ValueIteratorBase::ValueIteratorBase()
 
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
 
-ValueIteratorBase::ValueIteratorBase(
-    const Value::ObjectValues::iterator &current)
+ValueIteratorBase::ValueIteratorBase(const Value::ObjectValues::iterator &current)
     : current_(current), isNull_(false) {}
 
 #else
-ValueIteratorBase::ValueIteratorBase(
-    const ValueInternalArray::IteratorState &state)
-    : isArray_(true) {
+ValueIteratorBase::ValueIteratorBase(const ValueInternalArray::IteratorState &state) : isArray_(true) {
     iterator_.array_ = state;
 }
 
-ValueIteratorBase::ValueIteratorBase(
-    const ValueInternalMap::IteratorState &state)
-    : isArray_(false) {
+ValueIteratorBase::ValueIteratorBase(const ValueInternalMap::IteratorState &state) : isArray_(false) {
     iterator_.map_ = state;
 }
 #endif
@@ -2466,8 +2341,7 @@ void ValueIteratorBase::decrement() {
 #endif
 }
 
-ValueIteratorBase::difference_type ValueIteratorBase::computeDistance(
-    const SelfType &other) const {
+ValueIteratorBase::difference_type ValueIteratorBase::computeDistance(const SelfType &other) const {
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
 #ifdef JSON_USE_CPPTL_SMALLMAP
     return current_ - other.current_;
@@ -2476,16 +2350,11 @@ ValueIteratorBase::difference_type ValueIteratorBase::computeDistance(
     if (isNull_ && other.isNull_) { return 0; }
 
     difference_type myDistance = 0;
-    for (Value::ObjectValues::iterator it = current_; it != other.current_;
-         ++it) {
-        ++myDistance;
-    }
+    for (Value::ObjectValues::iterator it = current_; it != other.current_; ++it) { ++myDistance; }
     return myDistance;
 #endif
 #else
-    if (isArray_)
-        return ValueInternalArray::distance(iterator_.array_,
-                                            other.iterator_.array_);
+    if (isArray_) return ValueInternalArray::distance(iterator_.array_, other.iterator_.array_);
     return ValueInternalMap::distance(iterator_.map_, other.iterator_.map_);
 #endif
 }
@@ -2495,9 +2364,7 @@ bool ValueIteratorBase::isEqual(const SelfType &other) const {
     if (isNull_) { return other.isNull_; }
     return current_ == other.current_;
 #else
-    if (isArray_)
-        return ValueInternalArray::equals(iterator_.array_,
-                                          other.iterator_.array_);
+    if (isArray_) return ValueInternalArray::equals(iterator_.array_, other.iterator_.array_);
     return ValueInternalMap::equals(iterator_.map_, other.iterator_.map_);
 #endif
 }
@@ -2516,8 +2383,7 @@ Value ValueIteratorBase::key() const {
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
     const Value::CZString czstring = (*current_).first;
     if (czstring.c_str()) {
-        if (czstring.isStaticString())
-            return Value(StaticString(czstring.c_str()));
+        if (czstring.isStaticString()) return Value(StaticString(czstring.c_str()));
         return Value(czstring.c_str());
     }
     return Value(czstring.index());
@@ -2536,8 +2402,7 @@ UInt ValueIteratorBase::index() const {
     if (!czstring.c_str()) return czstring.index();
     return Value::UInt(-1);
 #else
-    if (isArray_)
-        return Value::UInt(ValueInternalArray::indexOf(iterator_.array_));
+    if (isArray_) return Value::UInt(ValueInternalArray::indexOf(iterator_.array_));
     return Value::UInt(-1);
 #endif
 }
@@ -2556,22 +2421,15 @@ ValueConstIterator::ValueConstIterator() {}
 
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
 
-ValueConstIterator::ValueConstIterator(
-    const Value::ObjectValues::iterator &current)
-    : ValueIteratorBase(current) {}
+ValueConstIterator::ValueConstIterator(const Value::ObjectValues::iterator &current) : ValueIteratorBase(current) {}
 
 #else
-ValueConstIterator::ValueConstIterator(
-    const ValueInternalArray::IteratorState &state)
-    : ValueIteratorBase(state) {}
+ValueConstIterator::ValueConstIterator(const ValueInternalArray::IteratorState &state) : ValueIteratorBase(state) {}
 
-ValueConstIterator::ValueConstIterator(
-    const ValueInternalMap::IteratorState &state)
-    : ValueIteratorBase(state) {}
+ValueConstIterator::ValueConstIterator(const ValueInternalMap::IteratorState &state) : ValueIteratorBase(state) {}
 #endif
 
-ValueConstIterator &ValueConstIterator::operator=(
-    const ValueIteratorBase &other) {
+ValueConstIterator &ValueConstIterator::operator=(const ValueIteratorBase &other) {
     copy(other);
     return *this;
 }
@@ -2580,22 +2438,17 @@ ValueIterator::ValueIterator() {}
 
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
 
-ValueIterator::ValueIterator(const Value::ObjectValues::iterator &current)
-    : ValueIteratorBase(current) {}
+ValueIterator::ValueIterator(const Value::ObjectValues::iterator &current) : ValueIteratorBase(current) {}
 
 #else
-ValueIterator::ValueIterator(const ValueInternalArray::IteratorState &state)
-    : ValueIteratorBase(state) {}
+ValueIterator::ValueIterator(const ValueInternalArray::IteratorState &state) : ValueIteratorBase(state) {}
 
-ValueIterator::ValueIterator(const ValueInternalMap::IteratorState &state)
-    : ValueIteratorBase(state) {}
+ValueIterator::ValueIterator(const ValueInternalMap::IteratorState &state) : ValueIteratorBase(state) {}
 #endif
 
-ValueIterator::ValueIterator(const ValueConstIterator &other)
-    : ValueIteratorBase(other) {}
+ValueIterator::ValueIterator(const ValueConstIterator &other) : ValueIteratorBase(other) {}
 
-ValueIterator::ValueIterator(const ValueIterator &other)
-    : ValueIteratorBase(other) {}
+ValueIterator::ValueIterator(const ValueIterator &other) : ValueIteratorBase(other) {}
 
 ValueIterator &ValueIterator::operator=(const SelfType &other) {
     copy(other);
@@ -2677,8 +2530,7 @@ static inline bool InRange(double d, T min, U max) {
 }
 #endif
 
-static inline char *duplicateStringValue(const char *value,
-                                         unsigned int length = unknown) {
+static inline char *duplicateStringValue(const char *value, unsigned int length = unknown) {
     if (length == unknown) length = (unsigned int)strlen(value);
 
     if (length >= (unsigned)Value::maxInt) length = Value::maxInt - 1;
@@ -2716,9 +2568,7 @@ Value::CommentInfo::~CommentInfo() {
 void Value::CommentInfo::setComment(const char *text) {
     if (comment_) releaseStringValue(comment_);
     JSON_ASSERT(text != 0);
-    JSON_ASSERT_MESSAGE(
-        text[0] == '\0' || text[0] == '/',
-        "in Json::Value::setComment(): Comments must start with /");
+    JSON_ASSERT_MESSAGE(text[0] == '\0' || text[0] == '/', "in Json::Value::setComment(): Comments must start with /");
 
     comment_ = duplicateStringValue(text);
 }
@@ -2728,20 +2578,14 @@ void Value::CommentInfo::setComment(const char *text) {
 Value::CZString::CZString(ArrayIndex index) : cstr_(0), index_(index) {}
 
 Value::CZString::CZString(const char *cstr, DuplicationPolicy allocate)
-    : cstr_(allocate == duplicate ? duplicateStringValue(cstr) : cstr),
-      index_(allocate) {}
+    : cstr_(allocate == duplicate ? duplicateStringValue(cstr) : cstr), index_(allocate) {}
 
 Value::CZString::CZString(const CZString &other)
-    : cstr_(other.index_ != noDuplication && other.cstr_ != 0 ?
-                duplicateStringValue(other.cstr_) :
-                other.cstr_),
-      index_(other.cstr_ ?
-                 (other.index_ == noDuplication ? noDuplication : duplicate) :
-                 other.index_) {}
+    : cstr_(other.index_ != noDuplication && other.cstr_ != 0 ? duplicateStringValue(other.cstr_) : other.cstr_),
+      index_(other.cstr_ ? (other.index_ == noDuplication ? noDuplication : duplicate) : other.index_) {}
 
 Value::CZString::~CZString() {
-    if (cstr_ && index_ == duplicate)
-        releaseStringValue(const_cast<char *>(cstr_));
+    if (cstr_ && index_ == duplicate) releaseStringValue(const_cast<char *>(cstr_));
 }
 
 void Value::CZString::swap(CZString &other) {
@@ -2916,8 +2760,7 @@ Value::Value(const char *beginValue, const char *endValue)
       comments_(0),
       start_(0),
       limit_(0) {
-    value_.string_ =
-        duplicateStringValue(beginValue, (unsigned int)(endValue - beginValue));
+    value_.string_ = duplicateStringValue(beginValue, (unsigned int)(endValue - beginValue));
 }
 
 Value::Value(const std::string &value)
@@ -2931,8 +2774,7 @@ Value::Value(const std::string &value)
       comments_(0),
       start_(0),
       limit_(0) {
-    value_.string_ =
-        duplicateStringValue(value.c_str(), (unsigned int)value.length());
+    value_.string_ = duplicateStringValue(value.c_str(), (unsigned int)value.length());
 }
 
 Value::Value(const StaticString &value)
@@ -3014,8 +2856,7 @@ Value::Value(const Value &other)
             break;
 #else
         case arrayValue:
-            value_.array_ =
-                arrayAllocator()->newArrayCopy(*other.value_.array_);
+            value_.array_ = arrayAllocator()->newArrayCopy(*other.value_.array_);
             break;
         case objectValue:
             value_.map_ = mapAllocator()->newMapCopy(*other.value_.map_);
@@ -3028,8 +2869,7 @@ Value::Value(const Value &other)
         comments_ = new CommentInfo[numberOfCommentPlacement];
         for (int comment = 0; comment < numberOfCommentPlacement; ++comment) {
             const CommentInfo &otherComment = other.comments_[comment];
-            if (otherComment.comment_)
-                comments_[comment].setComment(otherComment.comment_);
+            if (otherComment.comment_) comments_[comment].setComment(otherComment.comment_);
         }
     }
 }
@@ -3106,8 +2946,7 @@ bool Value::operator<(const Value &other) const {
             return value_.bool_ < other.value_.bool_;
         case stringValue:
             return (value_.string_ == 0 && other.value_.string_) ||
-                   (other.value_.string_ && value_.string_ &&
-                    strcmp(value_.string_, other.value_.string_) < 0);
+                   (other.value_.string_ && value_.string_ && strcmp(value_.string_, other.value_.string_) < 0);
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
         case arrayValue:
         case objectValue: {
@@ -3149,13 +2988,11 @@ bool Value::operator==(const Value &other) const {
             return value_.bool_ == other.value_.bool_;
         case stringValue:
             return (value_.string_ == other.value_.string_) ||
-                   (other.value_.string_ && value_.string_ &&
-                    strcmp(value_.string_, other.value_.string_) == 0);
+                   (other.value_.string_ && value_.string_ && strcmp(value_.string_, other.value_.string_) == 0);
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
         case arrayValue:
         case objectValue:
-            return value_.map_->size() == other.value_.map_->size() &&
-                   (*value_.map_) == (*other.value_.map_);
+            return value_.map_->size() == other.value_.map_->size() && (*value_.map_) == (*other.value_.map_);
 #else
         case arrayValue:
             return value_.array_->compare(*(other.value_.array_)) == 0;
@@ -3171,8 +3008,7 @@ bool Value::operator==(const Value &other) const {
 bool Value::operator!=(const Value &other) const { return !(*this == other); }
 
 const char *Value::asCString() const {
-    JSON_ASSERT_MESSAGE(type_ == stringValue,
-                        "in Json::Value::asCString(): requires stringValue");
+    JSON_ASSERT_MESSAGE(type_ == stringValue, "in Json::Value::asCString(): requires stringValue");
     return value_.string_;
 }
 
@@ -3196,9 +3032,7 @@ std::string Value::asString() const {
 }
 
 #ifdef JSON_USE_CPPTL
-CppTL::ConstString Value::asConstString() const {
-    return CppTL::ConstString(asString().c_str());
-}
+CppTL::ConstString Value::asConstString() const { return CppTL::ConstString(asString().c_str()); }
 #endif
 
 Value::Int Value::asInt() const {
@@ -3210,8 +3044,7 @@ Value::Int Value::asInt() const {
             JSON_ASSERT_MESSAGE(isInt(), "LargestUInt out of Int range");
             return Int(value_.uint_);
         case realValue:
-            JSON_ASSERT_MESSAGE(InRange(value_.real_, minInt, maxInt),
-                                "double out of Int range");
+            JSON_ASSERT_MESSAGE(InRange(value_.real_, minInt, maxInt), "double out of Int range");
             return Int(value_.real_);
         case nullValue:
             return 0;
@@ -3232,8 +3065,7 @@ Value::UInt Value::asUInt() const {
             JSON_ASSERT_MESSAGE(isUInt(), "LargestUInt out of UInt range");
             return UInt(value_.uint_);
         case realValue:
-            JSON_ASSERT_MESSAGE(InRange(value_.real_, 0, maxUInt),
-                                "double out of UInt range");
+            JSON_ASSERT_MESSAGE(InRange(value_.real_, 0, maxUInt), "double out of UInt range");
             return UInt(value_.real_);
         case nullValue:
             return 0;
@@ -3255,8 +3087,7 @@ Value::Int64 Value::asInt64() const {
             JSON_ASSERT_MESSAGE(isInt64(), "LargestUInt out of Int64 range");
             return Int64(value_.uint_);
         case realValue:
-            JSON_ASSERT_MESSAGE(InRange(value_.real_, minInt64, maxInt64),
-                                "double out of Int64 range");
+            JSON_ASSERT_MESSAGE(InRange(value_.real_, minInt64, maxInt64), "double out of Int64 range");
             return Int64(value_.real_);
         case nullValue:
             return 0;
@@ -3276,8 +3107,7 @@ Value::UInt64 Value::asUInt64() const {
         case uintValue:
             return UInt64(value_.uint_);
         case realValue:
-            JSON_ASSERT_MESSAGE(InRange(value_.real_, 0, maxUInt64),
-                                "double out of UInt64 range");
+            JSON_ASSERT_MESSAGE(InRange(value_.real_, 0, maxUInt64), "double out of UInt64 range");
             return UInt64(value_.real_);
         case nullValue:
             return 0;
@@ -3372,28 +3202,21 @@ bool Value::asBool() const {
 bool Value::isConvertibleTo(ValueType other) const {
     switch (other) {
         case nullValue:
-            return (isNumeric() && asDouble() == 0.0) ||
-                   (type_ == booleanValue && value_.bool_ == false) ||
-                   (type_ == stringValue && asString() == "") ||
-                   (type_ == arrayValue && value_.map_->size() == 0) ||
-                   (type_ == objectValue && value_.map_->size() == 0) ||
-                   type_ == nullValue;
+            return (isNumeric() && asDouble() == 0.0) || (type_ == booleanValue && value_.bool_ == false) ||
+                   (type_ == stringValue && asString() == "") || (type_ == arrayValue && value_.map_->size() == 0) ||
+                   (type_ == objectValue && value_.map_->size() == 0) || type_ == nullValue;
         case intValue:
-            return isInt() ||
-                   (type_ == realValue &&
-                    InRange(value_.real_, minInt, maxInt)) ||
-                   type_ == booleanValue || type_ == nullValue;
+            return isInt() || (type_ == realValue && InRange(value_.real_, minInt, maxInt)) || type_ == booleanValue ||
+                   type_ == nullValue;
         case uintValue:
-            return isUInt() ||
-                   (type_ == realValue && InRange(value_.real_, 0, maxUInt)) ||
-                   type_ == booleanValue || type_ == nullValue;
+            return isUInt() || (type_ == realValue && InRange(value_.real_, 0, maxUInt)) || type_ == booleanValue ||
+                   type_ == nullValue;
         case realValue:
             return isNumeric() || type_ == booleanValue || type_ == nullValue;
         case booleanValue:
             return isNumeric() || type_ == booleanValue || type_ == nullValue;
         case stringValue:
-            return isNumeric() || type_ == booleanValue ||
-                   type_ == stringValue || type_ == nullValue;
+            return isNumeric() || type_ == booleanValue || type_ == stringValue || type_ == nullValue;
         case arrayValue:
             return type_ == arrayValue || type_ == nullValue;
         case objectValue:
@@ -3443,9 +3266,8 @@ bool Value::empty() const {
 bool Value::operator!() const { return isNull(); }
 
 void Value::clear() {
-    JSON_ASSERT_MESSAGE(
-        type_ == nullValue || type_ == arrayValue || type_ == objectValue,
-        "in Json::Value::clear(): requires complex value");
+    JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == arrayValue || type_ == objectValue,
+                        "in Json::Value::clear(): requires complex value");
     start_ = 0;
     limit_ = 0;
     switch (type_) {
@@ -3468,8 +3290,7 @@ void Value::clear() {
 }
 
 void Value::resize(ArrayIndex newSize) {
-    JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == arrayValue,
-                        "in Json::Value::resize(): requires arrayValue");
+    JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == arrayValue, "in Json::Value::resize(): requires arrayValue");
     if (type_ == nullValue) *this = Value(arrayValue);
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
     ArrayIndex oldSize = size();
@@ -3478,9 +3299,7 @@ void Value::resize(ArrayIndex newSize) {
     else if (newSize > oldSize)
         (*this)[newSize - 1];
     else {
-        for (ArrayIndex index = newSize; index < oldSize; ++index) {
-            value_.map_->erase(index);
-        }
+        for (ArrayIndex index = newSize; index < oldSize; ++index) { value_.map_->erase(index); }
         assert(size() == newSize);
     }
 #else
@@ -3489,9 +3308,8 @@ void Value::resize(ArrayIndex newSize) {
 }
 
 Value &Value::operator[](ArrayIndex index) {
-    JSON_ASSERT_MESSAGE(
-        type_ == nullValue || type_ == arrayValue,
-        "in Json::Value::operator[](ArrayIndex): requires arrayValue");
+    JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == arrayValue,
+                        "in Json::Value::operator[](ArrayIndex): requires arrayValue");
     if (type_ == nullValue) *this = Value(arrayValue);
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
     CZString key(index);
@@ -3507,16 +3325,13 @@ Value &Value::operator[](ArrayIndex index) {
 }
 
 Value &Value::operator[](int index) {
-    JSON_ASSERT_MESSAGE(
-        index >= 0,
-        "in Json::Value::operator[](int index): index cannot be negative");
+    JSON_ASSERT_MESSAGE(index >= 0, "in Json::Value::operator[](int index): index cannot be negative");
     return (*this)[ArrayIndex(index)];
 }
 
 const Value &Value::operator[](ArrayIndex index) const {
-    JSON_ASSERT_MESSAGE(
-        type_ == nullValue || type_ == arrayValue,
-        "in Json::Value::operator[](ArrayIndex)const: requires arrayValue");
+    JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == arrayValue,
+                        "in Json::Value::operator[](ArrayIndex)const: requires arrayValue");
     if (type_ == nullValue) return null;
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
     CZString key(index);
@@ -3536,21 +3351,16 @@ const Value &Value::operator[](int index) const {
     return (*this)[ArrayIndex(index)];
 }
 
-Value &Value::operator[](const char *key) {
-    return resolveReference(key, false);
-}
+Value &Value::operator[](const char *key) { return resolveReference(key, false); }
 
 Value &Value::resolveReference(const char *key, bool isStatic) {
-    JSON_ASSERT_MESSAGE(
-        type_ == nullValue || type_ == objectValue,
-        "in Json::Value::resolveReference(): requires objectValue");
+    JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == objectValue,
+                        "in Json::Value::resolveReference(): requires objectValue");
     if (type_ == nullValue) *this = Value(objectValue);
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
-    CZString actualKey(
-        key, isStatic ? CZString::noDuplication : CZString::duplicateOnCopy);
+    CZString actualKey(key, isStatic ? CZString::noDuplication : CZString::duplicateOnCopy);
     ObjectValues::iterator it = value_.map_->lower_bound(actualKey);
-    if (it != value_.map_->end() && (*it).first == actualKey)
-        return (*it).second;
+    if (it != value_.map_->end() && (*it).first == actualKey) return (*it).second;
 
     ObjectValues::value_type defaultValue(actualKey, null);
     it = value_.map_->insert(it, defaultValue);
@@ -3569,9 +3379,8 @@ Value Value::get(ArrayIndex index, const Value &defaultValue) const {
 bool Value::isValidIndex(ArrayIndex index) const { return index < size(); }
 
 const Value &Value::operator[](const char *key) const {
-    JSON_ASSERT_MESSAGE(
-        type_ == nullValue || type_ == objectValue,
-        "in Json::Value::operator[](char const*)const: requires objectValue");
+    JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == objectValue,
+                        "in Json::Value::operator[](char const*)const: requires objectValue");
     if (type_ == nullValue) return null;
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
     CZString actualKey(key, CZString::noDuplication);
@@ -3584,26 +3393,16 @@ const Value &Value::operator[](const char *key) const {
 #endif
 }
 
-Value &Value::operator[](const std::string &key) {
-    return (*this)[key.c_str()];
-}
+Value &Value::operator[](const std::string &key) { return (*this)[key.c_str()]; }
 
-const Value &Value::operator[](const std::string &key) const {
-    return (*this)[key.c_str()];
-}
+const Value &Value::operator[](const std::string &key) const { return (*this)[key.c_str()]; }
 
-Value &Value::operator[](const StaticString &key) {
-    return resolveReference(key, true);
-}
+Value &Value::operator[](const StaticString &key) { return resolveReference(key, true); }
 
 #ifdef JSON_USE_CPPTL
-Value &Value::operator[](const CppTL::ConstString &key) {
-    return (*this)[key.c_str()];
-}
+Value &Value::operator[](const CppTL::ConstString &key) { return (*this)[key.c_str()]; }
 
-const Value &Value::operator[](const CppTL::ConstString &key) const {
-    return (*this)[key.c_str()];
-}
+const Value &Value::operator[](const CppTL::ConstString &key) const { return (*this)[key.c_str()]; }
 #endif
 
 Value &Value::append(const Value &value) { return (*this)[size()] = value; }
@@ -3613,9 +3412,7 @@ Value Value::get(const char *key, const Value &defaultValue) const {
     return value == &null ? defaultValue : *value;
 }
 
-Value Value::get(const std::string &key, const Value &defaultValue) const {
-    return get(key.c_str(), defaultValue);
-}
+Value Value::get(const std::string &key, const Value &defaultValue) const { return get(key.c_str(), defaultValue); }
 
 Value Value::removeMember(const char *key) {
     JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == objectValue,
@@ -3640,13 +3437,10 @@ Value Value::removeMember(const char *key) {
 #endif
 }
 
-Value Value::removeMember(const std::string &key) {
-    return removeMember(key.c_str());
-}
+Value Value::removeMember(const std::string &key) { return removeMember(key.c_str()); }
 
 #ifdef JSON_USE_CPPTL
-Value Value::get(const CppTL::ConstString &key,
-                 const Value &defaultValue) const {
+Value Value::get(const CppTL::ConstString &key, const Value &defaultValue) const {
     return get(key.c_str(), defaultValue);
 }
 #endif
@@ -3656,35 +3450,28 @@ bool Value::isMember(const char *key) const {
     return value != &null;
 }
 
-bool Value::isMember(const std::string &key) const {
-    return isMember(key.c_str());
-}
+bool Value::isMember(const std::string &key) const { return isMember(key.c_str()); }
 
 #ifdef JSON_USE_CPPTL
-bool Value::isMember(const CppTL::ConstString &key) const {
-    return isMember(key.c_str());
-}
+bool Value::isMember(const CppTL::ConstString &key) const { return isMember(key.c_str()); }
 #endif
 
 Value::Members Value::getMemberNames() const {
-    JSON_ASSERT_MESSAGE(
-        type_ == nullValue || type_ == objectValue,
-        "in Json::Value::getMemberNames(), value must be objectValue");
+    JSON_ASSERT_MESSAGE(type_ == nullValue || type_ == objectValue,
+                        "in Json::Value::getMemberNames(), value must be objectValue");
     if (type_ == nullValue) return Value::Members();
     Members members;
     members.reserve(value_.map_->size());
 #ifndef JSON_VALUE_USE_INTERNAL_MAP
     ObjectValues::const_iterator it = value_.map_->begin();
     ObjectValues::const_iterator itEnd = value_.map_->end();
-    for (; it != itEnd; ++it)
-        members.push_back(std::string((*it).first.c_str()));
+    for (; it != itEnd; ++it) members.push_back(std::string((*it).first.c_str()));
 #else
     ValueInternalMap::IteratorState it;
     ValueInternalMap::IteratorState itEnd;
     value_.map_->makeBeginIterator(it);
     value_.map_->makeEndIterator(itEnd);
-    for (; !ValueInternalMap::equals(it, itEnd);
-         ValueInternalMap::increment(it))
+    for (; !ValueInternalMap::equals(it, itEnd); ValueInternalMap::increment(it))
         members.push_back(std::string(ValueInternalMap::key(it)));
 #endif
     return members;
@@ -3706,8 +3493,7 @@ bool Value::isInt() const {
         case uintValue:
             return value_.uint_ <= UInt(maxInt);
         case realValue:
-            return value_.real_ >= minInt && value_.real_ <= maxInt &&
-                   IsIntegral(value_.real_);
+            return value_.real_ >= minInt && value_.real_ <= maxInt && IsIntegral(value_.real_);
         default:
             break;
     }
@@ -3717,13 +3503,11 @@ bool Value::isInt() const {
 bool Value::isUInt() const {
     switch (type_) {
         case intValue:
-            return value_.int_ >= 0 &&
-                   LargestUInt(value_.int_) <= LargestUInt(maxUInt);
+            return value_.int_ >= 0 && LargestUInt(value_.int_) <= LargestUInt(maxUInt);
         case uintValue:
             return value_.uint_ <= maxUInt;
         case realValue:
-            return value_.real_ >= 0 && value_.real_ <= maxUInt &&
-                   IsIntegral(value_.real_);
+            return value_.real_ >= 0 && value_.real_ <= maxUInt && IsIntegral(value_.real_);
         default:
             break;
     }
@@ -3739,8 +3523,7 @@ bool Value::isInt64() const {
             return value_.uint_ <= UInt64(maxInt64);
         case realValue:
 
-            return value_.real_ >= double(minInt64) &&
-                   value_.real_ < double(maxInt64) && IsIntegral(value_.real_);
+            return value_.real_ >= double(minInt64) && value_.real_ < double(maxInt64) && IsIntegral(value_.real_);
         default:
             break;
     }
@@ -3757,8 +3540,7 @@ bool Value::isUInt64() const {
             return true;
         case realValue:
 
-            return value_.real_ >= 0 && value_.real_ < maxUInt64AsDouble &&
-                   IsIntegral(value_.real_);
+            return value_.real_ >= 0 && value_.real_ < maxUInt64AsDouble && IsIntegral(value_.real_);
         default:
             break;
     }
@@ -3933,14 +3715,11 @@ Value::iterator Value::end() {
 
 PathArgument::PathArgument() : key_(), index_(), kind_(kindNone) {}
 
-PathArgument::PathArgument(ArrayIndex index)
-    : key_(), index_(index), kind_(kindIndex) {}
+PathArgument::PathArgument(ArrayIndex index) : key_(), index_(index), kind_(kindIndex) {}
 
-PathArgument::PathArgument(const char *key)
-    : key_(key), index_(), kind_(kindKey) {}
+PathArgument::PathArgument(const char *key) : key_(key), index_(), kind_(kindKey) {}
 
-PathArgument::PathArgument(const std::string &key)
-    : key_(key.c_str()), index_(), kind_(kindKey) {}
+PathArgument::PathArgument(const std::string &key) : key_(key.c_str()), index_(), kind_(kindKey) {}
 
 Path::Path(const std::string &path,
            const PathArgument &a1,
@@ -3968,13 +3747,11 @@ void Path::makePath(const std::string &path, const InArgs &in) {
                 addPathInArg(path, in, itInArg, PathArgument::kindIndex);
             else {
                 ArrayIndex index = 0;
-                for (; current != end && *current >= '0' && *current <= '9';
-                     ++current)
+                for (; current != end && *current >= '0' && *current <= '9'; ++current)
                     index = index * 10 + ArrayIndex(*current - '0');
                 args_.push_back(index);
             }
-            if (current == end || *current++ != ']')
-                invalidPath(path, int(current - path.c_str()));
+            if (current == end || *current++ != ']') invalidPath(path, int(current - path.c_str()));
         } else if (*current == '%') {
             addPathInArg(path, in, itInArg, PathArgument::kindKey);
             ++current;
@@ -4022,8 +3799,7 @@ Value Path::resolve(const Value &root, const Value &defaultValue) const {
     for (Args::const_iterator it = args_.begin(); it != args_.end(); ++it) {
         const PathArgument &arg = *it;
         if (arg.kind_ == PathArgument::kindIndex) {
-            if (!node->isArray() || !node->isValidIndex(arg.index_))
-                return defaultValue;
+            if (!node->isArray() || !node->isValidIndex(arg.index_)) return defaultValue;
             node = &((*node)[arg.index_]);
         } else if (arg.kind_ == PathArgument::kindKey) {
             if (!node->isObject()) return defaultValue;
@@ -4105,13 +3881,9 @@ std::string valueToString(LargestUInt value) {
 
 #if defined(JSON_HAS_INT64)
 
-std::string valueToString(Int value) {
-    return valueToString(LargestInt(value));
-}
+std::string valueToString(Int value) { return valueToString(LargestInt(value)); }
 
-std::string valueToString(UInt value) {
-    return valueToString(LargestUInt(value));
-}
+std::string valueToString(UInt value) { return valueToString(LargestUInt(value)); }
 
 #endif
 
@@ -4150,8 +3922,7 @@ std::string valueToString(bool value) { return value ? "true" : "false"; }
 std::string valueToQuotedString(const char *value) {
     if (value == NULL) return "";
 
-    if (strpbrk(value, "\"\\\b\f\n\r\t") == NULL &&
-        !containsControlCharacter(value))
+    if (strpbrk(value, "\"\\\b\f\n\r\t") == NULL && !containsControlCharacter(value))
         return std::string("\"") + value + "\"";
 
     std::string::size_type maxsize = strlen(value) * 2 + 3;
@@ -4185,8 +3956,7 @@ std::string valueToQuotedString(const char *value) {
             default:
                 if (isControlCharacter(*c)) {
                     std::ostringstream oss;
-                    oss << "\\u" << std::hex << std::uppercase
-                        << std::setfill('0') << std::setw(4)
+                    oss << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4)
                         << static_cast<int>(*c);
                     result += oss.str();
                 } else {
@@ -4201,10 +3971,7 @@ std::string valueToQuotedString(const char *value) {
 
 Writer::~Writer() {}
 
-FastWriter::FastWriter()
-    : yamlCompatiblityEnabled_(false),
-      dropNullPlaceholders_(false),
-      omitEndingLineFeed_(false) {}
+FastWriter::FastWriter() : yamlCompatiblityEnabled_(false), dropNullPlaceholders_(false), omitEndingLineFeed_(false) {}
 
 void FastWriter::enableYAMLCompatibility() { yamlCompatiblityEnabled_ = true; }
 
@@ -4251,8 +4018,7 @@ void FastWriter::writeValue(const Value &value) {
         case objectValue: {
             Value::Members members(value.getMemberNames());
             document_ += "{";
-            for (Value::Members::iterator it = members.begin();
-                 it != members.end(); ++it) {
+            for (Value::Members::iterator it = members.begin(); it != members.end(); ++it) {
                 const std::string &name = *it;
                 if (it != members.begin()) document_ += ",";
                 document_ += valueToQuotedString(name.c_str());
@@ -4264,8 +4030,7 @@ void FastWriter::writeValue(const Value &value) {
     }
 }
 
-StyledWriter::StyledWriter()
-    : rightMargin_(74), indentSize_(3), addChildValues_() {}
+StyledWriter::StyledWriter() : rightMargin_(74), indentSize_(3), addChildValues_() {}
 
 std::string StyledWriter::write(const Value &root) {
     document_ = "";
@@ -4377,9 +4142,7 @@ bool StyledWriter::isMultineArray(const Value &value) {
     childValues_.clear();
     for (int index = 0; index < size && !isMultiLine; ++index) {
         const Value &childValue = value[index];
-        isMultiLine =
-            isMultiLine || ((childValue.isArray() || childValue.isObject()) &&
-                            childValue.size() > 0);
+        isMultiLine = isMultiLine || ((childValue.isArray() || childValue.isObject()) && childValue.size() > 0);
     }
     if (!isMultiLine) {
         childValues_.reserve(size);
@@ -4428,8 +4191,7 @@ void StyledWriter::writeCommentBeforeValue(const Value &root) {
 
     document_ += "\n";
     writeIndent();
-    std::string normalizedComment =
-        normalizeEOL(root.getComment(commentBefore));
+    std::string normalizedComment = normalizeEOL(root.getComment(commentBefore));
     std::string::const_iterator iter = normalizedComment.begin();
     while (iter != normalizedComment.end()) {
         document_ += *iter;
@@ -4442,8 +4204,7 @@ void StyledWriter::writeCommentBeforeValue(const Value &root) {
 
 void StyledWriter::writeCommentAfterValueOnSameLine(const Value &root) {
     if (root.hasComment(commentAfterOnSameLine))
-        document_ +=
-            " " + normalizeEOL(root.getComment(commentAfterOnSameLine));
+        document_ += " " + normalizeEOL(root.getComment(commentAfterOnSameLine));
 
     if (root.hasComment(commentAfter)) {
         document_ += "\n";
@@ -4453,8 +4214,7 @@ void StyledWriter::writeCommentAfterValueOnSameLine(const Value &root) {
 }
 
 bool StyledWriter::hasCommentForValue(const Value &value) {
-    return value.hasComment(commentBefore) ||
-           value.hasComment(commentAfterOnSameLine) ||
+    return value.hasComment(commentBefore) || value.hasComment(commentAfterOnSameLine) ||
            value.hasComment(commentAfter);
 }
 
@@ -4476,10 +4236,7 @@ std::string StyledWriter::normalizeEOL(const std::string &text) {
 }
 
 StyledStreamWriter::StyledStreamWriter(std::string indentation)
-    : document_(NULL),
-      rightMargin_(74),
-      indentation_(indentation),
-      addChildValues_() {}
+    : document_(NULL), rightMargin_(74), indentation_(indentation), addChildValues_() {}
 
 void StyledStreamWriter::write(std::ostream &out, const Value &root) {
     document_ = &out;
@@ -4591,9 +4348,7 @@ bool StyledStreamWriter::isMultineArray(const Value &value) {
     childValues_.clear();
     for (int index = 0; index < size && !isMultiLine; ++index) {
         const Value &childValue = value[index];
-        isMultiLine =
-            isMultiLine || ((childValue.isArray() || childValue.isObject()) &&
-                            childValue.size() > 0);
+        isMultiLine = isMultiLine || ((childValue.isArray() || childValue.isObject()) && childValue.size() > 0);
     }
     if (!isMultiLine) {
         childValues_.reserve(size);
@@ -4638,8 +4393,7 @@ void StyledStreamWriter::writeCommentBeforeValue(const Value &root) {
 
 void StyledStreamWriter::writeCommentAfterValueOnSameLine(const Value &root) {
     if (root.hasComment(commentAfterOnSameLine))
-        *document_ << " " +
-                          normalizeEOL(root.getComment(commentAfterOnSameLine));
+        *document_ << " " + normalizeEOL(root.getComment(commentAfterOnSameLine));
 
     if (root.hasComment(commentAfter)) {
         *document_ << "\n";
@@ -4649,8 +4403,7 @@ void StyledStreamWriter::writeCommentAfterValueOnSameLine(const Value &root) {
 }
 
 bool StyledStreamWriter::hasCommentForValue(const Value &value) {
-    return value.hasComment(commentBefore) ||
-           value.hasComment(commentAfterOnSameLine) ||
+    return value.hasComment(commentBefore) || value.hasComment(commentAfterOnSameLine) ||
            value.hasComment(commentAfter);
 }
 
@@ -4706,17 +4459,7 @@ using std::stack;
 using std::string;
 }  // namespace TankGame
 namespace TankGame {
-enum FieldItem {
-    None = 0,
-    Brick = 1,
-    Steel = 2,
-    Base = 4,
-    Blue0 = 8,
-    Blue1 = 16,
-    Red0 = 32,
-    Red1 = 64,
-    Water = 128
-};
+enum FieldItem { None = 0, Brick = 1, Steel = 2, Base = 4, Blue0 = 8, Blue1 = 16, Red0 = 32, Red1 = 64, Water = 128 };
 }
 namespace TankGame {
 enum FireDirection { Nof = 0, X = 1, Y = 2, Both = 3 };
@@ -4750,18 +4493,7 @@ template <typename T>
 T &operator^=(T &a, T b);
 }
 namespace TankGame {
-enum Action {
-    Invalid = -2,
-    Stay = -1,
-    Up,
-    Right,
-    Down,
-    Left,
-    UpShoot,
-    RightShoot,
-    DownShoot,
-    LeftShoot
-};
+enum Action { Invalid = -2, Stay = -1, Up, Right, Down, Left, UpShoot, RightShoot, DownShoot, LeftShoot };
 }
 namespace TankGame {
 int const fieldHeight = 9;
@@ -4836,18 +4568,14 @@ class TankField {
     bool tankAlive[sideCount][tankPerSide] = {{true, true}, {true, true}};
     bool baseAlive[sideCount] = {true, true};
     bool shouldInit = false;
-    int tankX[sideCount][tankPerSide] = {
-        {fieldWidth / 2 - 2, fieldWidth / 2 + 2},
-        {fieldWidth / 2 + 2, fieldWidth / 2 - 2}};
-    int tankY[sideCount][tankPerSide] = {{0, 0},
-                                         {fieldHeight - 1, fieldHeight - 1}};
+    int tankX[sideCount][tankPerSide] = {{fieldWidth / 2 - 2, fieldWidth / 2 + 2},
+                                         {fieldWidth / 2 + 2, fieldWidth / 2 - 2}};
+    int tankY[sideCount][tankPerSide] = {{0, 0}, {fieldHeight - 1, fieldHeight - 1}};
     int currentTurn = 1;
     int mySide;
     stack<DisappearLog> logs;
-    Action previousActions[101][sideCount][tankPerSide] = {
-        {{Stay, Stay}, {Stay, Stay}}};
-    Action nextAction[sideCount][tankPerSide] = {{Invalid, Invalid},
-                                                 {Invalid, Invalid}};
+    Action previousActions[101][sideCount][tankPerSide] = {{{Stay, Stay}, {Stay, Stay}}};
+    Action nextAction[sideCount][tankPerSide] = {{Invalid, Invalid}, {Invalid, Invalid}};
 
     bool ActionIsValid(int side, int tank, Action act);
 
@@ -4892,22 +4620,14 @@ void _processRequestOrResponse(Json::Value &value, bool isOpponent);
 }  // namespace TankGame
 namespace TankGame {
 namespace Internals {
-void _submitAction(Action tank0,
-                   Action tank1,
-                   string debug = "",
-                   string data = "",
-                   string globalData = "");
+void _submitAction(Action tank0, Action tank1, string debug = "", string data = "", string globalData = "");
 }
 }  // namespace TankGame
 namespace TankGame {
 void ReadInput(istream &in, string &outData, string &outGlobalData);
 }
 namespace TankGame {
-void SubmitAndExit(Action tank0,
-                   Action tank1,
-                   string debug = "",
-                   string data = "",
-                   string globalData = "");
+void SubmitAndExit(Action tank0, Action tank1, string debug = "", string data = "", string globalData = "");
 }
 namespace TankGame {
 void SubmitAndDontExit(Action tank0, Action tank1);
@@ -4963,19 +4683,13 @@ namespace TankGame {
 LZZ_INLINE bool ActionIsMove(Action x) { return x >= Up && x <= Left; }
 }  // namespace TankGame
 namespace TankGame {
-LZZ_INLINE bool ActionIsShoot(Action x) {
-    return x >= UpShoot && x <= LeftShoot;
-}
+LZZ_INLINE bool ActionIsShoot(Action x) { return x >= UpShoot && x <= LeftShoot; }
 }  // namespace TankGame
 namespace TankGame {
-LZZ_INLINE bool ActionDirectionIsOpposite(Action a, Action b) {
-    return a >= Up && b >= Up && (a + 2) % 4 == b % 4;
-}
+LZZ_INLINE bool ActionDirectionIsOpposite(Action a, Action b) { return a >= Up && b >= Up && (a + 2) % 4 == b % 4; }
 }  // namespace TankGame
 namespace TankGame {
-LZZ_INLINE bool CoordValid(int x, int y) {
-    return x >= 0 && x < fieldWidth && y >= 0 && y < fieldHeight;
-}
+LZZ_INLINE bool CoordValid(int x, int y) { return x >= 0 && x < fieldWidth && y >= 0 && y < fieldHeight; }
 }  // namespace TankGame
 namespace TankGame {
 LZZ_INLINE bool HasMultipleTank(FieldItem item) {
@@ -4985,14 +4699,10 @@ LZZ_INLINE bool HasMultipleTank(FieldItem item) {
 }
 }  // namespace TankGame
 namespace TankGame {
-LZZ_INLINE int GetTankSide(FieldItem item) {
-    return item == Blue0 || item == Blue1 ? Blue : Red;
-}
+LZZ_INLINE int GetTankSide(FieldItem item) { return item == Blue0 || item == Blue1 ? Blue : Red; }
 }  // namespace TankGame
 namespace TankGame {
-LZZ_INLINE int GetTankID(FieldItem item) {
-    return item == Blue0 || item == Red0 ? 0 : 1;
-}
+LZZ_INLINE int GetTankID(FieldItem item) { return item == Blue0 || item == Red0 ? 0 : 1; }
 }  // namespace TankGame
 namespace TankGame {
 LZZ_INLINE int ExtractDirectionFromAction(Action x) {
@@ -5028,8 +4738,7 @@ namespace TankGame {
 int const(dy)[4] = {-1, 0, 1, 0};
 }
 namespace TankGame {
-FieldItem const((tankItemTypes)[sideCount])[tankPerSide] = {{Blue0, Blue1},
-                                                            {Red0, Red1}};
+FieldItem const((tankItemTypes)[sideCount])[tankPerSide] = {{Blue0, Blue1}, {Red0, Red1}};
 }
 namespace TankGame {
 int maxTurn = 100;
@@ -5046,22 +4755,18 @@ bool DisappearLog::operator<(DisappearLog const &b) const {
 namespace TankGame {
 bool TankField::ActionIsValid(int side, int tank, Action act) {
     if (act == Invalid) return false;
-    if (act > Left &&
-        previousActions[currentTurn - 1][side][tank] > Left)  // 连续两回合射击
+    if (act > Left && previousActions[currentTurn - 1][side][tank] > Left)  // 连续两回合射击
         return false;
     if (act == Stay || act > Left) return true;
     int x = tankX[side][tank] + dx[act], y = tankY[side][tank] + dy[act];
-    return CoordValid(x, y) &&
-           gameField[y][x] == None;  // water cannot be stepped on
+    return CoordValid(x, y) && gameField[y][x] == None;  // water cannot be stepped on
 }
 }  // namespace TankGame
 namespace TankGame {
 bool TankField::ActionIsValid() {
     for (int side = 0; side < sideCount; side++)
         for (int tank = 0; tank < tankPerSide; tank++)
-            if (tankAlive[side][tank] &&
-                !ActionIsValid(side, tank, nextAction[side][tank]))
-                return false;
+            if (tankAlive[side][tank] && !ActionIsValid(side, tank, nextAction[side][tank])) return false;
     return true;
 }
 }  // namespace TankGame
@@ -5134,13 +4839,10 @@ bool TankField::DoAction() {
                     // it can be handled as None
                     if (items != None && items != Water) {
                         // 对射判断
-                        if (items >= Blue0 && !hasMultipleTankWithMe &&
-                            !HasMultipleTank(items)) {
+                        if (items >= Blue0 && !hasMultipleTankWithMe && !HasMultipleTank(items)) {
                             // 自己这里和射到的目标格子都只有一个坦克
-                            Action theirAction = nextAction[GetTankSide(items)]
-                                                           [GetTankID(items)];
-                            if (ActionIsShoot(theirAction) &&
-                                ActionDirectionIsOpposite(act, theirAction)) {
+                            Action theirAction = nextAction[GetTankSide(items)][GetTankID(items)];
+                            if (ActionIsShoot(theirAction) && ActionDirectionIsOpposite(act, theirAction)) {
                                 // 而且我方和对方的射击方向是反的
                                 // 那么就忽视这次射击
                                 break;
@@ -5166,8 +4868,7 @@ bool TankField::DoAction() {
     for (auto &log : itemsToBeDestroyed) {
         switch (log.item) {
             case Base: {
-                int side =
-                    log.x == baseX[Blue] && log.y == baseY[Blue] ? Blue : Red;
+                int side = log.x == baseX[Blue] && log.y == baseY[Blue] ? Blue : Red;
                 baseAlive[side] = false;
                 break;
             }
@@ -5192,8 +4893,7 @@ bool TankField::DoAction() {
     }
 
     for (int side = 0; side < sideCount; side++)
-        for (int tank = 0; tank < tankPerSide; tank++)
-            nextAction[side][tank] = Invalid;
+        for (int tank = 0; tank < tankPerSide; tank++) nextAction[side][tank] = Invalid;
 
     currentTurn++;
     return true;
@@ -5202,7 +4902,6 @@ bool TankField::DoAction() {
 namespace TankGame {
 bool TankField::Revert() {
     if (currentTurn == 1) return false;
-
     currentTurn--;
     while (!logs.empty()) {
         DisappearLog &log = logs.top();
@@ -5210,9 +4909,7 @@ bool TankField::Revert() {
             logs.pop();
             switch (log.item) {
                 case Base: {
-                    int side = log.x == baseX[Blue] && log.y == baseY[Blue] ?
-                                   Blue :
-                                   Red;
+                    int side = log.x == baseX[Blue] && log.y == baseY[Blue] ? Blue : Red;
                     baseAlive[side] = true;
                     gameField[log.y][log.x] = Base;
                     break;
@@ -5244,20 +4941,14 @@ namespace TankGame {
 GameResult TankField::GetGameResult() {
     bool fail[sideCount] = {};
     for (int side = 0; side < sideCount; side++)
-        if ((!tankAlive[side][0] && !tankAlive[side][1]) || !baseAlive[side])
-            fail[side] = true;
-    if (fail[0] == fail[1])
-        return fail[0] || currentTurn > maxTurn ? Draw : NotFinished;
+        if ((!tankAlive[side][0] && !tankAlive[side][1]) || !baseAlive[side]) fail[side] = true;
+    if (fail[0] == fail[1]) return fail[0] || currentTurn > maxTurn ? Draw : NotFinished;
     if (fail[Blue]) return Red;
     return Blue;
 }
 }  // namespace TankGame
 namespace TankGame {
-TankField::TankField(int(hasBrick)[3],
-                     int(hasWater)[3],
-                     int(hasSteel)[3],
-                     int mySide)
-    : mySide(mySide) {
+TankField::TankField(int(hasBrick)[3], int(hasWater)[3], int(hasSteel)[3], int mySide) : mySide(mySide) {
     for (int i = 0; i < 3; i++) {
         int mask = 1;
         for (int y = i * 3; y < (i + 1) * 3; y++) {
@@ -5274,8 +4965,7 @@ TankField::TankField(int(hasBrick)[3],
     }
     for (int side = 0; side < sideCount; side++) {
         for (int tank = 0; tank < tankPerSide; tank++)
-            gameField[tankY[side][tank]][tankX[side][tank]] =
-                tankItemTypes[side][tank];
+            gameField[tankY[side][tank]][tankX[side][tank]] = tankItemTypes[side][tank];
         gameField[baseY[side]][baseX[side]] = Base;
     }
 }
@@ -5289,10 +4979,8 @@ void TankField::DebugPrint() {
     const char *slimHR = "------------------------------";
     cout << boldHR << endl
          << "legend: " << endl
-         << ". - empty\t# - brick\t% - steel\t* - base\t@ - more than 1 tanks"
-         << endl
-         << "b - blue0\tB - blue1\tr - red0\tR - red1\tW - water"
-         << endl  // Tank2 feature
+         << ". - empty\t# - brick\t% - steel\t* - base\t@ - more than 1 tanks" << endl
+         << "b - blue0\tB - blue1\tr - red0\tR - red1\tW - water" << endl  // Tank2 feature
          << slimHR << endl;
     for (int y = 0; y < fieldHeight; y++) {
         for (int x = 0; x < fieldWidth; x++) {
@@ -5349,11 +5037,9 @@ void TankField::DebugPrint() {
     // }
     cout << slimHR << endl;
     for (int side = 0; side < sideCount; side++) {
-        cout << side2String[side] << ": base" << ' '
-             << boolean2String[baseAlive[side]];
+        cout << side2String[side] << ": base" << ' ' << boolean2String[baseAlive[side]];
         for (int tank = 0; tank < tankPerSide; tank++)
-            cout << ", tank" << tank << ' '
-                 << boolean2String[tankAlive[side][tank]];
+            cout << ", tank" << tank << ' ' << boolean2String[tankAlive[side][tank]];
         cout << endl;
     }
     cout << "current turn: " << currentTurn << ", ";
@@ -5381,8 +5067,7 @@ bool TankField::operator!=(TankField const &b) const {
             if (tankAlive[side][tank] != b.tankAlive[side][tank]) return true;
         }
 
-    if (baseAlive[0] != b.baseAlive[0] || baseAlive[1] != b.baseAlive[1])
-        return true;
+    if (baseAlive[0] != b.baseAlive[0] || baseAlive[1] != b.baseAlive[1]) return true;
 
     if (currentTurn != b.currentTurn) return true;
 
@@ -5408,25 +5093,22 @@ void _processRequestOrResponse(Json::Value &value, bool isOpponent) {
     if (value.isArray()) {
         if (!isOpponent) {
             for (int tank = 0; tank < tankPerSide; tank++)
-                field->nextAction[field->mySide][tank] =
-                    (Action)value[tank].asInt();
+                field->nextAction[field->mySide][tank] = (Action)value[tank].asInt();
         } else {
             for (int tank = 0; tank < tankPerSide; tank++)
-                field->nextAction[1 - field->mySide][tank] =
-                    (Action)value[tank].asInt();
+                field->nextAction[1 - field->mySide][tank] = (Action)value[tank].asInt();
             field->DoAction();
         }
     } else {
         // 是第一回合，裁判在介绍场地
         if (!field || field->shouldInit) {
             int hasBrick[3], hasWater[3], hasSteel[3];
-            for (int i = 0; i < 3; i++) {  // Tank2 feature(?????????????]
+            for (int i = 0; i < 3; i++) {  // Tank2 feature
                 hasWater[i] = value["waterfield"][i].asInt();
                 hasBrick[i] = value["brickfield"][i].asInt();
                 hasSteel[i] = value["steelfield"][i].asInt();
             }
-            field = new TankField(hasBrick, hasWater, hasSteel,
-                                  value["mySide"].asInt());
+            field = new TankField(hasBrick, hasWater, hasSteel, value["mySide"].asInt());
         }
     }
 }
@@ -5434,11 +5116,7 @@ void _processRequestOrResponse(Json::Value &value, bool isOpponent) {
 }  // namespace TankGame
 namespace TankGame {
 namespace Internals {
-void _submitAction(Action tank0,
-                   Action tank1,
-                   string debug,
-                   string data,
-                   string globalData) {
+void _submitAction(Action tank0, Action tank1, string debug, string data, string globalData) {
     Json::Value output(Json::objectValue), response(Json::arrayValue);
     response[0U] = tank0;
     response[1U] = tank1;
@@ -5470,32 +5148,24 @@ void ReadInput(istream &in, string &outData, string &outGlobalData) {
     Internals::reader.parse(inputString, input);
 
     if (input.isObject()) {
-        Json::Value requests = input["requests"],
-                    responses = input["responses"];
+        Json::Value requests = input["requests"], responses = input["responses"];
         if (responses.empty() && field) field->shouldInit = true;
         if (!requests.isNull() && requests.isArray()) {
             size_t i, n = requests.size();
             for (i = 0; i < n; i++) {
-                Internals::_processRequestOrResponse(
-                    requests[(Json::Value::UInt)i], true);
-                if (i < n - 1)
-                    Internals::_processRequestOrResponse(
-                        responses[(Json::Value::UInt)i], false);
+                Internals::_processRequestOrResponse(requests[(Json::Value::UInt)i], true);
+                if (i < n - 1) Internals::_processRequestOrResponse(responses[(Json::Value::UInt)i], false);
             }
             outData = input["data"].asString();
             outGlobalData = input["globaldata"].asString();
             return;
         }
     }
-    // Internals::_processRequestOrResponse(input, true); 这行好像永远不会执行的
+    Internals::_processRequestOrResponse(input, true);
 }
 }  // namespace TankGame
 namespace TankGame {
-void SubmitAndExit(Action tank0,
-                   Action tank1,
-                   string debug,
-                   string data,
-                   string globalData) {
+void SubmitAndExit(Action tank0, Action tank1, string debug, string data, string globalData) {
     Internals::_submitAction(tank0, tank1, debug, data, globalData);
     exit(0);
 }
@@ -5513,15 +5183,420 @@ int RandBetween(int from, int to) { return rand() % (to - from) + from; }
 
 TankGame::Action RandAction(int tank) {
     while (true) {
-        auto act = (TankGame::Action)RandBetween(TankGame::Stay,
-                                                 TankGame::LeftShoot + 1);
-        if (TankGame::field->ActionIsValid(TankGame::field->mySide, tank, act))
-            return act;
+        auto act = (TankGame::Action)RandBetween(TankGame::Stay, TankGame::LeftShoot + 1);
+        if (TankGame::field->ActionIsValid(TankGame::field->mySide, tank, act)) return act;
     }
 }
 
 #undef LZZ_INLINE
 
+#ifndef TANK_RULE_H
+#define TANK_RULE_H
+
+namespace TankGame {
+bool AbleToShoot(int, int, TankGame::TankField &);
+
+void MarkTheField(TankGame::TankField &);
+
+void DistanceToBase(int, TankGame::TankField &);
+
+std::pair<int, int> RuleDecision(int, TankGame::TankField &);
+}  // namespace TankGame
+
+#endif  // TANK_RULE_H
+
+namespace TankGame {
+bool AbleToShoot(int color, int tankNum, TankField &s) {
+    if (s.currentTurn == 1) return true;
+    return s.ActionIsValid(color, tankNum, UpShoot);
+}
+
+void MarkTheField(TankField &s) {  // 标记每点是否在双方坦克的攻击范围内及攻击方向
+    for (int i = 0; i < sideCount; i++) {
+        for (int j = 0; j < tankPerSide; j++) {
+            if (s.tankX[i][j] == -1)
+                continue;
+            else if (!AbleToShoot(i, j, s))
+                continue;
+            else {
+                for (int k = 0; k < 4; k++) {
+                    for (int l = 1;; l++) {
+                        int x = s.tankX[i][j] + l * dx[k], y = s.tankY[i][j] + l * dy[k];
+                        if (!CoordValid(x, y)) break;
+                        if (dy[k]) {
+                            if (s.mark[i][y][x] == Nof)
+                                s.mark[i][y][x] = Y;
+                            else if (s.mark[i][y][x] == X)
+                                s.mark[i][y][x] = Both;
+                        } else {
+                            if (s.mark[i][y][x] == Nof)
+                                s.mark[i][y][x] = X;
+                            else if (s.mark[i][y][x] == Y)
+                                s.mark[i][y][x] = Both;
+                        }
+                        if (!((s.gameField[y][x] == None) || (s.gameField[y][x] == Water) ||
+                              (s.gameField[y][x] == (1 << (5 - 2 * i))) || (s.gameField[y][x] == (1 << (6 - 2 * i))) ||
+                              (s.gameField[y][x] == (1 << (5 - 2 * i)) + (1 << (6 - 2 * i)))))
+                            break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void DistanceToBase(int color, TankField &s) {  // 算距离
+    struct tempdst {
+        int x;
+        int y;
+        int d;
+
+        tempdst(int _x, int _y, int _d) : x(_x), y(_y), d(_d) {}
+    };
+    class cmp {
+       public:
+        bool operator()(const tempdst &a, const tempdst &b) const { return (a.d > b.d); }
+    };
+    std::priority_queue<tempdst, std::vector<tempdst>, cmp> td;
+    memset(s.distance[color], -1, sizeof(s.distance[color]));
+    s.distance[color][baseY[color]][baseX[color]] = 0;
+    for (int k = 0; k < 4; k++) {
+        for (int l = 1;; l++) {
+            int x = baseX[color] + l * dx[k];
+            int y = baseY[color] + l * dy[k];
+            if (!CoordValid(x, y)) break;
+            bool Push = true;
+            if (s.gameField[y][x] == Water) {  // bug
+                Push = false;
+            }
+            if (s.gameField[y][x] == Steel || s.gameField[y][x] == Base) break;
+            s.distance[color][y][x] = s.distance[color][y - dy[k]][x - dx[k]];
+            if (s.gameField[y][x] == Brick) { s.distance[color][y][x] += 2; }
+            if (Push) td.push(tempdst(x, y, s.distance[color][y][x]));
+        }
+    }
+    while (!td.empty()) {
+        int xt = (td.top()).x;
+        int yt = (td.top()).y;
+        for (int k = 0; k < 4; k++) {
+            int x = xt + dx[k];
+            int y = yt + dy[k];
+            if (!CoordValid(x, y)) continue;
+            if (s.gameField[y][x] == Steel || s.gameField[y][x] == Water || s.gameField[y][x] == Base ||
+                s.distance[color][y][x] != -1)
+                continue;
+            if (s.gameField[y][x] == Brick) {
+                s.distance[color][y][x] = s.distance[color][yt][xt] + 2;
+                td.push(tempdst(x, y, s.distance[color][y][x]));
+            } else {
+                s.distance[color][y][x] = s.distance[color][yt][xt] + 1;
+                td.push(tempdst(x, y, s.distance[color][y][x]));
+            }
+        }
+        td.pop();
+    }
+}
+// 钢墙距离是-1，水的距离可能不是-1，不能通过距离判断这个格子上是什么
+}  // namespace TankGame
+namespace TankGame {
+std::pair<int, int> RuleDecision(int color, TankField &s) {
+    int decision[2] = {-1, -1};
+    std::vector<int> valid[2][2];
+    std::vector<int> survive[2][2];
+    bool finished[2] = {};
+    bool fire[2][2] = {};
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) { fire[i][j] = AbleToShoot(i, j, s); }
+    }
+    for (int c = 0; c < 2; c++) {
+        for (int i = 0; i < 2; i++) {
+            for (int j = -1; j < 8; j++) {
+                if (s.ActionIsValid(c, i, Action(j))) valid[c][i].push_back(j);
+            }
+        }
+        for (int i = 0; i < 2; i++) {
+            if (s.mark[1 - c][s.tankY[c][i]][s.tankX[c][i]] == 3) continue;
+            if (!(s.tankAlive[color][i])) continue;
+            if (fire[c][i]) {
+                if (s.mark[1 - c][s.tankY[c][i]][s.tankX[c][i]] == 2) {
+                    int x = s.tankX[c][i];
+                    int y = s.tankY[c][i];
+                    bool up = false, down = false;
+                    for (int j = 1;; j++) {
+                        if (!CoordValid(x, y + j)) break;
+                        if (s.gameField[y + j][x] != None) {
+                            for (int k = 0; k < 2; k++) {
+                                if (s.tankY[1 - c][k] == y + j && s.tankX[1 - c][k] == x) up = true;
+                            }
+                            break;
+                        }
+                    }
+                    for (int j = -1;; j--) {
+                        if (!CoordValid(x, y + j)) break;
+                        if (s.gameField[y + j][x] != None) {
+                            for (int k = 0; k < 2; k++) {
+                                if (s.tankY[1 - c][k] == y + j && s.tankX[1 - c][k] == x) down = true;
+                            }
+                            break;
+                        }
+                    }
+                    if (up && (!down))
+                        survive[c][i].push_back(4);
+                    else if (down && (!up))
+                        survive[c][i].push_back(6);
+                } else if (s.mark[1 - c][s.tankY[c][i]][s.tankX[c][i]] == 1) {
+                    int x = s.tankX[c][i];
+                    int y = s.tankY[c][i];
+                    bool left = false, right = false;
+                    for (int j = 1;; j++) {
+                        if (!CoordValid(x + j, y)) break;
+                        if (s.gameField[y][x + j] != None) {
+                            for (int k = 0; k < 2; k++) {
+                                if (s.tankY[1 - c][k] == y && s.tankX[1 - c][k] == x + j) right = true;
+                            }
+                            break;
+                        }
+                    }
+                    for (int j = -1;; j--) {
+                        if (!CoordValid(x + j, y)) break;
+                        if (s.gameField[y][x + j] != None) {
+                            for (int k = 0; k < 2; k++) {
+                                if (s.tankY[1 - c][k] == y && s.tankX[1 - c][k] == x + j) left = true;
+                            }
+                            break;
+                        }
+                    }
+                    if (left && (!right))
+                        survive[c][i].push_back(7);
+                    else if (right && (!left))
+                        survive[c][i].push_back(5);
+                } else {
+                    survive[c][i].push_back(4);
+                    survive[c][i].push_back(5);
+                    survive[c][i].push_back(6);
+                    survive[c][i].push_back(7);
+                }
+            }
+            if (s.mark[1 - c][s.tankY[c][i]][s.tankX[c][i]] == 0) survive[c][i].push_back(-1);
+            if (s.ActionIsValid(c, i, Action(0)) && s.mark[1 - c][s.tankY[c][i] - 1][s.tankX[c][i]] == 0)
+                survive[c][i].push_back(0);
+            if (s.ActionIsValid(c, i, Action(1)) && s.mark[1 - c][s.tankY[c][i]][s.tankX[c][i] + 1] == 0)
+                survive[c][i].push_back(1);
+            if (s.ActionIsValid(c, i, Action(2)) && s.mark[1 - c][s.tankY[c][i] + 1][s.tankX[c][i]] == 0)
+                survive[c][i].push_back(2);
+            if (s.ActionIsValid(c, i, Action(3)) && s.mark[1 - c][s.tankY[c][i]][s.tankX[c][i] - 1] == 0)
+                survive[c][i].push_back(3);
+        }
+    }
+    for (int i = 0; i < sideCount; i++) {
+        if (s.distance[1 - color][s.tankY[color][i]][s.tankX[color][i]] == 0 && fire[color][i] &&
+            s.tankAlive[color][i]) {
+            if (baseY[1 - color] - s.tankY[color][i] > 0)
+                decision[i] = 6;
+            else if (baseY[1 - color] - s.tankY[color][i] < 0)
+                decision[i] = 4;
+            else if (baseX[1 - color] - s.tankX[color][i] < 0)
+                decision[i] = 7;
+            else if (baseX[1 - color] - s.tankX[color][i] > 0)
+                decision[i] = 5;
+            if (!survive[color][1 - i].empty())
+                decision[1 - i] = survive[color][1 - i][0];
+            else
+                decision[1 - i] = -1;
+            return std::make_pair(decision[0], decision[1]);
+        }
+    }
+    int nextItem[2][2][4] = {};  // 上右下左
+    for (int c = 0; c < 2; c++) {
+        for (int i = 0; i < 2; i++) {
+            for (int dir = 0; dir < 4; dir++) {
+                for (int l = 1;; l++) {
+                    int x = s.tankX[c][i] + l * dx[dir];
+                    int y = s.tankY[c][i] + l * dy[dir];
+                    if (!CoordValid(x, y)) break;
+                    if (s.gameField[y][x] != None && s.gameField[y][x] != Water) {
+                        nextItem[c][i][dir] = int(s.gameField[y][x]);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    for (int i = 0; i < sideCount; i++) {
+        if (survive[1 - color][i].empty()) {  // 对方坦克必死
+            int base = 2 * (1 - color) + i + 3;
+            for (int j = 0; j < 2; j++) {
+                if (fire[color][j]) {
+                    for (int dir = 0; dir < 4; dir++) {
+                        if (nextItem[color][j][dir] & (1 << base)) {
+                            decision[j] = dir + 4;
+                            finished[j] = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < 2; i++) {
+        if (finished[i]) continue;
+        bool move = false;
+        if (s.mark[1 - color][s.tankY[color][i]][s.tankX[color][i]] != Nof) move = true;
+        int minNone = 200;
+        int nonedir = -1;  // 这些可以改成vector
+        int brickmin = 200;
+        int brickdir = -1;
+        for (int dir = 0; dir < 4; dir++) {
+            int x = s.tankX[color][i] + dx[dir];
+            int y = s.tankY[color][i] + dy[dir];
+            if (!CoordValid(x, y)) continue;
+            if (s.mark[1 - color][y][x] != Nof) continue;
+            if (s.gameField[y][x] == None) {
+                if (s.mark[1 - color][y][x] == 0) {
+                    if (s.distance[1 - color][y][x] < minNone) {
+                        minNone = s.distance[1 - color][y][x];
+                        nonedir = dir;
+                    }
+                }
+            } else if (s.gameField[y][x] == Brick) {
+                if (s.mark[1 - color][y][x] == 0) {
+                    if (s.distance[1 - color][y][x] < brickmin) {
+                        brickmin = s.distance[1 - color][y][x];
+                        brickdir = dir;
+                    }
+                }
+            }
+        }
+        if (move) {
+            if (minNone == s.distance[1 - color][s.tankY[color][i]][s.tankX[color][i]] - 1) {
+                decision[i] = nonedir;
+            } else if (fire[color][i]) {
+                for (int dir = 0; dir < 4; dir++) {
+                    for (int j = 0; j < 2; j++) {
+                        if ((nextItem[color][i][dir] & (1 << (2 * (1 - color) + 3 + j))) && fire[1 - color][j]) {
+                            if ((nextItem[color][i][(dir + 2) % 4] & (1 << (2 * (1 - color) + 4 - j))) &&
+                                fire[1 - color][1 - j]) {
+                                decision[i] = nonedir;
+                            } else
+                                decision[i] = dir + 4;
+                        }
+                    }
+                }
+            } else
+                decision[i] = nonedir;
+        } else {
+            if (!fire[color][i]) {
+                if (minNone == s.distance[1 - color][s.tankY[color][i]][s.tankX[color][i]] - 1) {
+                    decision[i] = nonedir;
+                } else
+                    decision[i] = -1;
+            } else {
+                if (brickmin == s.distance[1 - color][s.tankY[color][i]][s.tankX[color][i]] - 1) {
+                    if ((int(s.mark[1 - color][s.tankY[color][i] + dy[brickdir]][s.tankX[color][i] + dx[brickdir]]) !=
+                             3 &&
+                         (int(s.mark[1 - color][s.tankY[color][i] + dy[brickdir]][s.tankX[color][i] + dx[brickdir]]) -
+                          brickdir) %
+                                 2 !=
+                             0) ||
+                        (int(s.mark[1 - color][s.tankY[color][i] + dy[brickdir]][s.tankX[color][i] + dx[brickdir]]) ==
+                         0)) {
+                        decision[i] = brickdir + 4;
+                    }
+                } else {
+                    if (minNone == s.distance[1 - color][s.tankY[color][i]][s.tankX[color][i]] - 1) {
+                        if (nextItem[color][i][nonedir] == int(Brick)) {
+                            int x = s.tankX[color][i];
+                            int y = s.tankY[color][i];
+                            bool shoot = true;
+                            int l = 1;
+                            for (;; l++) {
+                                if (s.gameField[y + l * dy[nonedir]][x + l * dx[nonedir]] == None) {
+                                    if (s.distance[1 - color][y + l * dy[nonedir]][x + l * dx[nonedir]] !=
+                                        s.distance[1 - color][y + (l - 1) * dy[nonedir]][x + (l - 1) * dx[nonedir]] -
+                                            1) {
+                                        shoot = false;
+                                        break;
+                                    }
+                                } else {
+                                    if (s.gameField[y + l * dy[nonedir]][x + l * dx[nonedir]] != Brick) {
+                                        shoot = false;
+                                        break;
+                                    }
+                                    if (s.distance[1 - color][y + l * dy[nonedir]][x + l * dx[nonedir]] !=
+                                        s.distance[1 - color][y + (l - 1) * dy[nonedir]][x + (l - 1) * dx[nonedir]] -
+                                            1) {
+                                        shoot = false;
+                                    }
+                                    break;
+                                }
+                            }
+                            if (shoot) {
+                                int bx = x + l * dx[nonedir];
+                                int by = y + l * dy[nonedir];
+                                if ((int(s.mark[1 - color][by][bx]) != 3 &&
+                                     (int(s.mark[1 - color][by][bx]) - nonedir) % 2 != 0) ||
+                                    (int(s.mark[1 - color][by][bx] == 0))) {
+                                    decision[i] = nonedir + 4;
+                                } else
+                                    decision[i] = nonedir;
+                            } else
+                                decision[i] = nonedir;
+                        } else
+                            decision[i] = nonedir;
+                    } else if (s.tankX[color][i] == baseX[1 - color]) {
+                        int ddy;
+                        int ddx = 0;
+                        if (s.tankY[color][i] < baseY[1 - color])
+                            ddy = 1;
+                        else
+                            ddy = -1;
+                        bool shoot = !HasMultipleTank(s.gameField[s.tankY[color][i]][s.tankX[color][i]]);
+                        for (int l = 1;; l++) {
+                            int x = s.tankX[color][i] + l * ddx;
+                            int y = s.tankY[color][i] + l * ddy;
+                            if (s.gameField[y][x] == Base) break;
+                            if (s.gameField[y][x] != None && s.gameField[y][x] != Brick && s.gameField[y][x] != Water) {
+                                shoot = false;
+                                break;
+                            }
+                        }
+                        if (shoot) {
+                            if (ddy == 1) {
+                                decision[i] = 6;
+                            } else
+                                decision[i] = 4;
+                        }
+                    } else if (s.tankY[color][i] == baseY[1 - color]) {
+                        int ddy = 0;
+                        int ddx;
+                        if (s.tankX[color][i] < baseX[1 - color])
+                            ddx = 1;
+                        else
+                            ddx = -1;
+                        bool shoot = true;
+                        for (int l = 1;; l++) {
+                            int x = s.tankX[color][i] + l * ddx;
+                            int y = s.tankY[color][i] + l * ddy;
+                            if (s.gameField[y][x] == Base) break;
+                            if (s.gameField[y][x] != None && s.gameField[y][x] != Brick && s.gameField[y][x] != Water) {
+                                shoot = false;
+                                break;
+                            }
+                        }
+                        if (shoot) {
+                            if (ddx == 1) {
+                                decision[i] = 5;
+                            } else
+                                decision[i] = 7;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return std::make_pair(decision[0], decision[1]);
+}
+}  // namespace TankGame
 #ifndef BOT
 #define BOT
 
@@ -5533,9 +5608,9 @@ class Policy {
     Policy() {}
     Policy(int act_0, int act_1) : act_0(act_0), act_1(act_1) {}
 
-    bool operator<(const Policy &rhs) const {
-        return (act_0 < rhs.act_0) || (act_0 == rhs.act_0 && act_1 < rhs.act_1);
-    }
+    bool operator<(const Policy &rhs) const { return (act_0 < rhs.act_0) || (act_0 == rhs.act_0 && act_1 < rhs.act_1); }
+
+    bool operator==(const Policy &rhs) const { return act_0 == rhs.act_0 && act_1 == rhs.act_1; }
 
     bool empty() const { return act_0 == -2; }
 };
@@ -5544,7 +5619,7 @@ class Policy {
 class Node {
    public:
     int vis, size;
-    double val;
+    std::pair<double, double> val;
     Node *fa, *bstCh;
     std::map<std::pair<Policy, Policy>, Node *> ch;
     int dep;
@@ -5553,14 +5628,7 @@ class Node {
     bool full;
 
     Node(const std::pair<Policy, Policy> pol, Node *fa = nullptr)
-        : vis(0),
-          size(1),
-          val(0.0),
-          fa(fa),
-          bstCh(nullptr),
-          dep(fa ? fa->dep + 1 : 0),
-          pol(pol),
-          full(false) {}
+        : vis(0), size(1), val(0.0, 0.0), fa(fa), bstCh(nullptr), dep(fa ? fa->dep + 1 : 0), pol(pol), full(false) {}
 
     ~Node() {
         for (auto &p : ch) delete p.second;
@@ -5572,9 +5640,7 @@ class Node {
         return size;
     }
 
-    Node *NewChild(const std::pair<Policy, Policy> &pol) {
-        return ch[pol] = new Node(pol, this);
-    }
+    Node *NewChild(const std::pair<Policy, Policy> &pol) { return ch[pol] = new Node(pol, this); }
 
     void DelFather() {
         fa->ch[pol] = nullptr;
@@ -5585,22 +5651,36 @@ class Node {
 
 class Bot {
    public:
-    const double C;
+    TankGame::TankField state;
+    // parameter
+    const double TIME_LIMIT;
+    const double C, dist_c, rule_c, shoot_c, noteff_shoot_c, self_kill_c;
+    const int rollOut;
     const int TRAIN_UNIT = 100;
 
     // notice that the policy is in [-1,7], so we should +1 in the following
     double val[9][9][2];
     int vis[9][9][2];
-
     unsigned long long timing;
-
-    const double TIME_LIMIT;
-
     Node *root;
-    TankGame::TankField state;
 
-    Bot(const TankGame::TankField &s, double C)
-        : state(s), TIME_LIMIT(0.8), C(C) {
+    Bot(const TankGame::TankField &s,
+        double C = 0.9,
+        double dist_c = 0.1,
+        double rule_c = 0.2,
+        double shoot_c = 0.2,
+        double noteff_shoot_c = 0.2,
+        double self_kill_c = 0.2,
+        int rollOut = 5)
+        : state(s),
+          TIME_LIMIT(0.9),
+          C(C),
+          dist_c(dist_c),
+          rule_c(rule_c),
+          shoot_c(shoot_c),
+          noteff_shoot_c(noteff_shoot_c),
+          self_kill_c(self_kill_c),
+          rollOut(rollOut) {
         root = new Node(std::make_pair(Policy(-2, -2), Policy(-2, -2)));
     }
     ~Bot() { delete root; }
@@ -5613,9 +5693,7 @@ class Bot {
 
     Node *RandomMove(Node *);
 
-    double Utility(TankGame::GameResult);
-
-    void BackPropagation(Node *, double);
+    void BackPropagation(Node *, const std::pair<double, double> &);
 
     void RollOut(Node *);
 
@@ -5626,17 +5704,76 @@ class Bot {
     Policy GenDecision(bool);
 
     void Play(const std::pair<Policy, Policy> &);
+
+    std::pair<double, double> Eval(Node *, TankGame::TankField &s);
+
+    std::pair<double, double> Penalty(Node *, TankGame::TankField &s);
 };
 
 #endif
 
+#include <cassert>
+
 void Print(Node *p) {
     for (auto i : p->ch) {
-        printf("((%d, %d), (%d, %d)) %p\n", i.first.first.act_0,
-               i.first.first.act_1, i.first.second.act_0, i.first.second.act_1,
-               i.second);
+        printf("((%d, %d), (%d, %d)) %p\n", i.first.first.act_0, i.first.first.act_1, i.first.second.act_0,
+               i.first.second.act_1, i.second);
     }
     puts("");
+}
+
+std::pair<double, double> Bot::Eval(Node *p, TankGame::TankField &s) {
+    double resb, resr;
+    TankGame::MarkTheField(s);
+    TankGame::DistanceToBase(0, s);
+    TankGame::DistanceToBase(1, s);
+    // 距离和中枪的评估，红蓝互为相反数
+    resb = (-s.distance[1][s.tankY[0][0]][s.tankX[0][0]] - s.distance[1][s.tankY[0][1]][s.tankX[0][1]] +
+            s.distance[0][s.tankY[1][0]][s.tankX[1][0]] + s.distance[0][s.tankY[1][1]][s.tankX[1][1]]) *
+               dist_c +
+           (-s.mark[0][s.tankY[0][0]][s.tankX[0][0]] - s.mark[0][s.tankY[0][1]][s.tankX[0][1]] +
+            s.mark[1][s.tankY[1][0]][s.tankX[1][0]] + s.mark[1][s.tankY[1][1]][s.tankX[1][1]]) *
+               shoot_c;
+    resr = -resb;
+    return std::make_pair(resb, resr);
+}
+
+std::pair<double, double> Bot::Penalty(Node *p, TankGame::TankField &s) {
+    double resb = 0, resr = 0;
+    // 注意s要返回之前的局面一下
+    if (!s.Revert()) return std::make_pair(resb, resr);
+    // 向空地、钢铁和队友射击的惩罚
+    short noeff_penalty[2] = {2, 2}, self_kill_penalty[2] = {0};
+    // 看看在向什么地方射击
+    for (int side = 0; side < TankGame::sideCount; side++)
+        for (int tank = 0; tank < TankGame::tankPerSide; tank++) {
+            TankGame::Action act = s.previousActions[s.currentTurn][side][tank];
+            if (ActionIsShoot(act)) {
+                int dir = ExtractDirectionFromAction(act);
+                int x = s.tankX[side][tank], y = s.tankY[side][tank];
+                while (true) {
+                    x += TankGame::dx[dir];
+                    y += TankGame::dy[dir];
+                    if (!TankGame::CoordValid(x, y)) break;
+                    TankGame::FieldItem items = s.gameField[y][x];
+                    if (items != TankGame::None && items != TankGame::Water && items != TankGame::Steel) {
+                        if (x == s.tankX[side][!tank] && y == s.tankY[side][!tank]) self_kill_penalty[side]++;
+                        noeff_penalty[side]--;
+                        break;
+                    }
+                }
+            } else
+                noeff_penalty[side]--;
+        }
+    resb -= noeff_penalty[0] * noteff_shoot_c + self_kill_penalty[0] * self_kill_c;
+    resr -= noeff_penalty[1] * noteff_shoot_c + self_kill_penalty[1] * self_kill_c;
+
+    // 如果和纯规则的策略一样，给予适当的奖励
+    std::pair<int, int> ruleBlue = TankGame::RuleDecision(0, s);
+    std::pair<int, int> ruleRed = TankGame::RuleDecision(1, s);
+    if (p->fa->pol.first == Policy(ruleBlue.first, ruleBlue.second)) resb += rule_c;
+    if (p->fa->pol.second == Policy(ruleRed.first, ruleRed.second)) resb += rule_c;
+    return std::make_pair(resb, resr);
 }
 
 bool Bot::MCTS() {
@@ -5678,8 +5815,7 @@ bool Bot::IsFullyExpanded(Node *p) {
                         state.ActionIsValid(0, 1, TankGame::Action(actBlue1)) &&
                         state.ActionIsValid(1, 0, TankGame::Action(actRed0)) &&
                         state.ActionIsValid(1, 1, TankGame::Action(actRed1)) &&
-                        !p->ch.count(std::make_pair(Policy(actBlue0, actBlue1),
-                                                    Policy(actRed0, actRed1))))
+                        !p->ch.count(std::make_pair(Policy(actBlue0, actBlue1), Policy(actRed0, actRed1))))
                         return p->full = 0;
                 }
             }
@@ -5712,8 +5848,7 @@ Node *Bot::RandomMove(Node *p) {
                         state.ActionIsValid(1, 0, TankGame::Action(actRed0)) &&
                         state.ActionIsValid(1, 1, TankGame::Action(actRed1))) {
                         std::pair<Policy, Policy> pol =
-                            std::make_pair(Policy(actBlue0, actBlue1),
-                                           Policy(actRed0, actRed1));
+                            std::make_pair(Policy(actBlue0, actBlue1), Policy(actRed0, actRed1));
                         if (!p->ch.count(pol)) { return p->NewChild(pol); }
                     }
                     if (!state.tankAlive[1][1]) break;
@@ -5727,36 +5862,31 @@ Node *Bot::RandomMove(Node *p) {
     return nullptr;
 }
 
-double Bot::Utility(TankGame::GameResult res) {
-    if (res == 0)
-        return 1.0;
-    else if (res == 1)
-        return 0.0;
-    else
-        return 0.5;
-}
-
-// random roll-out until terminal state
+// roll-out
 void Bot::RollOut(Node *p) {
     Node *ch;
+    int count = 0;
+    std::pair<double, double> pen = Penalty(p, state);
+    Move(p->pol);
     for (Node *t = p;; t = ch, Move(t->pol)) {
         ch = RandomMove(t);
-        TankGame::GameResult res = state.GetGameResult();
-        if (res != TankGame::NotFinished) {
-            if (!p->ch.empty()) {
-                delete p->ch.begin()->second;
-                p->full = 0;
-                p->ch.clear();
-            }
-            BackPropagation(p, Utility(res));
-            return;
-        }
+        if (++count > rollOut) break;
     }
+    if (!p->ch.empty()) {
+        delete p->ch.begin()->second;
+        p->full = 0;
+        p->ch.clear();
+    }
+    std::pair<double, double> eva = Eval(p, state);
+    eva.first += pen.first;
+    eva.second += pen.second;
+    BackPropagation(p, eva);
 }
 
-void Bot::BackPropagation(Node *p, double utility) {
+void Bot::BackPropagation(Node *p, const std::pair<double, double> &u) {
     while (p) {
-        p->val += utility;
+        p->val.first += u.first;
+        p->val.second += u.second;
         p->vis++;
         Update(p);
         p = p->fa;
@@ -5775,14 +5905,10 @@ void Bot::Update(Node *p) {
         // if(i.first.first.act_0==-2){
         //     puts("----");
         // }
-        val[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] +=
-            i.second->val;
-        val[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
-            i.second->val;
-        vis[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] +=
-            i.second->vis;
-        vis[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] +=
-            i.second->vis;
+        val[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] += i.second->val.first;
+        val[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] += i.second->val.second;
+        vis[i.first.first.act_0 + 1][i.first.first.act_1 + 1][0] += i.second->vis;
+        vis[i.first.second.act_0 + 1][i.first.second.act_1 + 1][1] += i.second->vis;
     }
     double mx = -1, tmp;
     int act_1 = -1, act_2 = -1;
@@ -5804,7 +5930,7 @@ void Bot::Update(Node *p) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
             if (vis[i][j][1]) {
-                tmp = 1.0 - val[i][j][1] / vis[i][j][1] +  // Expectaion
+                tmp = val[i][j][1] / vis[i][j][1] +  // Expectaion
                       C * sqrt(log(p->vis) / vis[i][j][1]);  // UCB length
                 if (tmp > mx) {
                     mx = tmp;
@@ -5820,9 +5946,6 @@ void Bot::Update(Node *p) {
     else
         p->bstCh = p->ch[pol];
 }
-
-#define DEBUG
-#undef DEBUG
 
 int Bot::Train() {
     int ret = 0;
@@ -5847,32 +5970,28 @@ Policy Bot::GenDecision(bool first) {
     else
         timing = clock() + int(TIME_LIMIT * CLOCKS_PER_SEC);
     int res = Train();
-    // printf("%d\n", res);
+    // printf("Train rounds: %d\n", res);
     if (root->ch.empty()) return Policy(-2, -2);
     memset(vis, 0, sizeof vis);
     memset(val, 0, sizeof val);
     bool flag = state.mySide == 1;
     if (flag) {
         for (auto &p : root->ch) {
-            vis[p.first.second.act_0 + 1][p.first.second.act_1 + 1][0] +=
-                p.second->vis;
-            val[p.first.second.act_0 + 1][p.first.second.act_1 + 1][0] +=
-                p.second->val;
+            vis[p.first.second.act_0 + 1][p.first.second.act_1 + 1][1] += p.second->vis;
+            val[p.first.second.act_0 + 1][p.first.second.act_1 + 1][1] += p.second->val.second;
         }
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
-                if (vis[i][j][0])
-                    val[i][j][0] = 1 - val[i][j][0] / vis[i][j][0];
+                if (vis[i][j][1])
+                    val[i][j][0] = val[i][j][1] / vis[i][j][1];
                 else
                     val[i][j][0] = 0;
             }
         }
     } else {
         for (auto &p : root->ch) {
-            vis[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0] +=
-                p.second->vis;
-            val[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0] +=
-                p.second->val;
+            vis[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0] += p.second->vis;
+            val[p.first.first.act_0 + 1][p.first.first.act_1 + 1][0] += p.second->val.first;
         }
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
@@ -5911,9 +6030,8 @@ void Bot::Play(const std::pair<Policy, Policy> &pol) {
 
 using namespace TankGame;
 
-const double TIME_LIMIT = 0.80;
-
 int main() {
+#define _BOTZONE_ONLINE
 #ifndef _BOTZONE_ONLINE
     freopen("in", "r", stdin);
 #endif
@@ -5926,11 +6044,10 @@ int main() {
     SubmitAndDontExit(Action(decision.act_0), Action(decision.act_1));
     while (1) {
         ReadInput(std::cin, data, globaldata);
-        bot.Play(std::make_pair(
-            Policy(field->previousActions[field->currentTurn - 1][0][0],
-                   field->previousActions[field->currentTurn - 1][0][1]),
-            Policy(field->previousActions[field->currentTurn - 1][1][0],
-                   field->previousActions[field->currentTurn - 1][1][1])));
+        bot.Play(std::make_pair(Policy(field->previousActions[field->currentTurn - 1][0][0],
+                                       field->previousActions[field->currentTurn - 1][0][1]),
+                                Policy(field->previousActions[field->currentTurn - 1][1][0],
+                                       field->previousActions[field->currentTurn - 1][1][1])));
         decision = bot.GenDecision(0);
         field->DebugPrint();
         SubmitAndDontExit(Action(decision.act_0), Action(decision.act_1));

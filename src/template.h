@@ -26,17 +26,7 @@ using std::stack;
 using std::string;
 }  // namespace TankGame
 namespace TankGame {
-enum FieldItem {
-    None = 0,
-    Brick = 1,
-    Steel = 2,
-    Base = 4,
-    Blue0 = 8,
-    Blue1 = 16,
-    Red0 = 32,
-    Red1 = 64,
-    Water = 128
-};
+enum FieldItem { None = 0, Brick = 1, Steel = 2, Base = 4, Blue0 = 8, Blue1 = 16, Red0 = 32, Red1 = 64, Water = 128 };
 }
 namespace TankGame {
 enum FireDirection { Nof = 0, X = 1, Y = 2, Both = 3 };
@@ -70,18 +60,7 @@ template <typename T>
 T &operator^=(T &a, T b);
 }
 namespace TankGame {
-enum Action {
-    Invalid = -2,
-    Stay = -1,
-    Up,
-    Right,
-    Down,
-    Left,
-    UpShoot,
-    RightShoot,
-    DownShoot,
-    LeftShoot
-};
+enum Action { Invalid = -2, Stay = -1, Up, Right, Down, Left, UpShoot, RightShoot, DownShoot, LeftShoot };
 }
 namespace TankGame {
 int const fieldHeight = 9;
@@ -156,18 +135,14 @@ class TankField {
     bool tankAlive[sideCount][tankPerSide] = {{true, true}, {true, true}};
     bool baseAlive[sideCount] = {true, true};
     bool shouldInit = false;
-    int tankX[sideCount][tankPerSide] = {
-        {fieldWidth / 2 - 2, fieldWidth / 2 + 2},
-        {fieldWidth / 2 + 2, fieldWidth / 2 - 2}};
-    int tankY[sideCount][tankPerSide] = {{0, 0},
-                                         {fieldHeight - 1, fieldHeight - 1}};
+    int tankX[sideCount][tankPerSide] = {{fieldWidth / 2 - 2, fieldWidth / 2 + 2},
+                                         {fieldWidth / 2 + 2, fieldWidth / 2 - 2}};
+    int tankY[sideCount][tankPerSide] = {{0, 0}, {fieldHeight - 1, fieldHeight - 1}};
     int currentTurn = 1;
     int mySide;
     stack<DisappearLog> logs;
-    Action previousActions[101][sideCount][tankPerSide] = {
-        {{Stay, Stay}, {Stay, Stay}}};
-    Action nextAction[sideCount][tankPerSide] = {{Invalid, Invalid},
-                                                 {Invalid, Invalid}};
+    Action previousActions[101][sideCount][tankPerSide] = {{{Stay, Stay}, {Stay, Stay}}};
+    Action nextAction[sideCount][tankPerSide] = {{Invalid, Invalid}, {Invalid, Invalid}};
 
     bool ActionIsValid(int side, int tank, Action act);
 
@@ -212,22 +187,14 @@ void _processRequestOrResponse(Json::Value &value, bool isOpponent);
 }  // namespace TankGame
 namespace TankGame {
 namespace Internals {
-void _submitAction(Action tank0,
-                   Action tank1,
-                   string debug = "",
-                   string data = "",
-                   string globalData = "");
+void _submitAction(Action tank0, Action tank1, string debug = "", string data = "", string globalData = "");
 }
 }  // namespace TankGame
 namespace TankGame {
 void ReadInput(istream &in, string &outData, string &outGlobalData);
 }
 namespace TankGame {
-void SubmitAndExit(Action tank0,
-                   Action tank1,
-                   string debug = "",
-                   string data = "",
-                   string globalData = "");
+void SubmitAndExit(Action tank0, Action tank1, string debug = "", string data = "", string globalData = "");
 }
 namespace TankGame {
 void SubmitAndDontExit(Action tank0, Action tank1);
@@ -283,19 +250,13 @@ namespace TankGame {
 LZZ_INLINE bool ActionIsMove(Action x) { return x >= Up && x <= Left; }
 }  // namespace TankGame
 namespace TankGame {
-LZZ_INLINE bool ActionIsShoot(Action x) {
-    return x >= UpShoot && x <= LeftShoot;
-}
+LZZ_INLINE bool ActionIsShoot(Action x) { return x >= UpShoot && x <= LeftShoot; }
 }  // namespace TankGame
 namespace TankGame {
-LZZ_INLINE bool ActionDirectionIsOpposite(Action a, Action b) {
-    return a >= Up && b >= Up && (a + 2) % 4 == b % 4;
-}
+LZZ_INLINE bool ActionDirectionIsOpposite(Action a, Action b) { return a >= Up && b >= Up && (a + 2) % 4 == b % 4; }
 }  // namespace TankGame
 namespace TankGame {
-LZZ_INLINE bool CoordValid(int x, int y) {
-    return x >= 0 && x < fieldWidth && y >= 0 && y < fieldHeight;
-}
+LZZ_INLINE bool CoordValid(int x, int y) { return x >= 0 && x < fieldWidth && y >= 0 && y < fieldHeight; }
 }  // namespace TankGame
 namespace TankGame {
 LZZ_INLINE bool HasMultipleTank(FieldItem item) {
@@ -305,14 +266,10 @@ LZZ_INLINE bool HasMultipleTank(FieldItem item) {
 }
 }  // namespace TankGame
 namespace TankGame {
-LZZ_INLINE int GetTankSide(FieldItem item) {
-    return item == Blue0 || item == Blue1 ? Blue : Red;
-}
+LZZ_INLINE int GetTankSide(FieldItem item) { return item == Blue0 || item == Blue1 ? Blue : Red; }
 }  // namespace TankGame
 namespace TankGame {
-LZZ_INLINE int GetTankID(FieldItem item) {
-    return item == Blue0 || item == Red0 ? 0 : 1;
-}
+LZZ_INLINE int GetTankID(FieldItem item) { return item == Blue0 || item == Red0 ? 0 : 1; }
 }  // namespace TankGame
 namespace TankGame {
 LZZ_INLINE int ExtractDirectionFromAction(Action x) {

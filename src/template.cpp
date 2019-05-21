@@ -25,8 +25,7 @@ namespace TankGame {
 int const(dy)[4] = {-1, 0, 1, 0};
 }
 namespace TankGame {
-FieldItem const((tankItemTypes)[sideCount])[tankPerSide] = {{Blue0, Blue1},
-                                                            {Red0, Red1}};
+FieldItem const((tankItemTypes)[sideCount])[tankPerSide] = {{Blue0, Blue1}, {Red0, Red1}};
 }
 namespace TankGame {
 int maxTurn = 100;
@@ -43,22 +42,18 @@ bool DisappearLog::operator<(DisappearLog const &b) const {
 namespace TankGame {
 bool TankField::ActionIsValid(int side, int tank, Action act) {
     if (act == Invalid) return false;
-    if (act > Left &&
-        previousActions[currentTurn - 1][side][tank] > Left)  // 连续两回合射击
+    if (act > Left && previousActions[currentTurn - 1][side][tank] > Left)  // 连续两回合射击
         return false;
     if (act == Stay || act > Left) return true;
     int x = tankX[side][tank] + dx[act], y = tankY[side][tank] + dy[act];
-    return CoordValid(x, y) &&
-           gameField[y][x] == None;  // water cannot be stepped on
+    return CoordValid(x, y) && gameField[y][x] == None;  // water cannot be stepped on
 }
 }  // namespace TankGame
 namespace TankGame {
 bool TankField::ActionIsValid() {
     for (int side = 0; side < sideCount; side++)
         for (int tank = 0; tank < tankPerSide; tank++)
-            if (tankAlive[side][tank] &&
-                !ActionIsValid(side, tank, nextAction[side][tank]))
-                return false;
+            if (tankAlive[side][tank] && !ActionIsValid(side, tank, nextAction[side][tank])) return false;
     return true;
 }
 }  // namespace TankGame
@@ -131,13 +126,10 @@ bool TankField::DoAction() {
                     // it can be handled as None
                     if (items != None && items != Water) {
                         // 对射判断
-                        if (items >= Blue0 && !hasMultipleTankWithMe &&
-                            !HasMultipleTank(items)) {
+                        if (items >= Blue0 && !hasMultipleTankWithMe && !HasMultipleTank(items)) {
                             // 自己这里和射到的目标格子都只有一个坦克
-                            Action theirAction = nextAction[GetTankSide(items)]
-                                                           [GetTankID(items)];
-                            if (ActionIsShoot(theirAction) &&
-                                ActionDirectionIsOpposite(act, theirAction)) {
+                            Action theirAction = nextAction[GetTankSide(items)][GetTankID(items)];
+                            if (ActionIsShoot(theirAction) && ActionDirectionIsOpposite(act, theirAction)) {
                                 // 而且我方和对方的射击方向是反的
                                 // 那么就忽视这次射击
                                 break;
@@ -163,8 +155,7 @@ bool TankField::DoAction() {
     for (auto &log : itemsToBeDestroyed) {
         switch (log.item) {
             case Base: {
-                int side =
-                    log.x == baseX[Blue] && log.y == baseY[Blue] ? Blue : Red;
+                int side = log.x == baseX[Blue] && log.y == baseY[Blue] ? Blue : Red;
                 baseAlive[side] = false;
                 break;
             }
@@ -189,8 +180,7 @@ bool TankField::DoAction() {
     }
 
     for (int side = 0; side < sideCount; side++)
-        for (int tank = 0; tank < tankPerSide; tank++)
-            nextAction[side][tank] = Invalid;
+        for (int tank = 0; tank < tankPerSide; tank++) nextAction[side][tank] = Invalid;
 
     currentTurn++;
     return true;
@@ -199,7 +189,6 @@ bool TankField::DoAction() {
 namespace TankGame {
 bool TankField::Revert() {
     if (currentTurn == 1) return false;
-
     currentTurn--;
     while (!logs.empty()) {
         DisappearLog &log = logs.top();
@@ -207,9 +196,7 @@ bool TankField::Revert() {
             logs.pop();
             switch (log.item) {
                 case Base: {
-                    int side = log.x == baseX[Blue] && log.y == baseY[Blue] ?
-                                   Blue :
-                                   Red;
+                    int side = log.x == baseX[Blue] && log.y == baseY[Blue] ? Blue : Red;
                     baseAlive[side] = true;
                     gameField[log.y][log.x] = Base;
                     break;
@@ -241,20 +228,14 @@ namespace TankGame {
 GameResult TankField::GetGameResult() {
     bool fail[sideCount] = {};
     for (int side = 0; side < sideCount; side++)
-        if ((!tankAlive[side][0] && !tankAlive[side][1]) || !baseAlive[side])
-            fail[side] = true;
-    if (fail[0] == fail[1])
-        return fail[0] || currentTurn > maxTurn ? Draw : NotFinished;
+        if ((!tankAlive[side][0] && !tankAlive[side][1]) || !baseAlive[side]) fail[side] = true;
+    if (fail[0] == fail[1]) return fail[0] || currentTurn > maxTurn ? Draw : NotFinished;
     if (fail[Blue]) return Red;
     return Blue;
 }
 }  // namespace TankGame
 namespace TankGame {
-TankField::TankField(int(hasBrick)[3],
-                     int(hasWater)[3],
-                     int(hasSteel)[3],
-                     int mySide)
-    : mySide(mySide) {
+TankField::TankField(int(hasBrick)[3], int(hasWater)[3], int(hasSteel)[3], int mySide) : mySide(mySide) {
     for (int i = 0; i < 3; i++) {
         int mask = 1;
         for (int y = i * 3; y < (i + 1) * 3; y++) {
@@ -271,8 +252,7 @@ TankField::TankField(int(hasBrick)[3],
     }
     for (int side = 0; side < sideCount; side++) {
         for (int tank = 0; tank < tankPerSide; tank++)
-            gameField[tankY[side][tank]][tankX[side][tank]] =
-                tankItemTypes[side][tank];
+            gameField[tankY[side][tank]][tankX[side][tank]] = tankItemTypes[side][tank];
         gameField[baseY[side]][baseX[side]] = Base;
     }
 }
@@ -286,10 +266,8 @@ void TankField::DebugPrint() {
     const char *slimHR = "------------------------------";
     cout << boldHR << endl
          << "legend: " << endl
-         << ". - empty\t# - brick\t% - steel\t* - base\t@ - more than 1 tanks"
-         << endl
-         << "b - blue0\tB - blue1\tr - red0\tR - red1\tW - water"
-         << endl  // Tank2 feature
+         << ". - empty\t# - brick\t% - steel\t* - base\t@ - more than 1 tanks" << endl
+         << "b - blue0\tB - blue1\tr - red0\tR - red1\tW - water" << endl  // Tank2 feature
          << slimHR << endl;
     for (int y = 0; y < fieldHeight; y++) {
         for (int x = 0; x < fieldWidth; x++) {
@@ -346,11 +324,9 @@ void TankField::DebugPrint() {
     // }
     cout << slimHR << endl;
     for (int side = 0; side < sideCount; side++) {
-        cout << side2String[side] << ": base" << ' '
-             << boolean2String[baseAlive[side]];
+        cout << side2String[side] << ": base" << ' ' << boolean2String[baseAlive[side]];
         for (int tank = 0; tank < tankPerSide; tank++)
-            cout << ", tank" << tank << ' '
-                 << boolean2String[tankAlive[side][tank]];
+            cout << ", tank" << tank << ' ' << boolean2String[tankAlive[side][tank]];
         cout << endl;
     }
     cout << "current turn: " << currentTurn << ", ";
@@ -378,8 +354,7 @@ bool TankField::operator!=(TankField const &b) const {
             if (tankAlive[side][tank] != b.tankAlive[side][tank]) return true;
         }
 
-    if (baseAlive[0] != b.baseAlive[0] || baseAlive[1] != b.baseAlive[1])
-        return true;
+    if (baseAlive[0] != b.baseAlive[0] || baseAlive[1] != b.baseAlive[1]) return true;
 
     if (currentTurn != b.currentTurn) return true;
 
@@ -405,25 +380,22 @@ void _processRequestOrResponse(Json::Value &value, bool isOpponent) {
     if (value.isArray()) {
         if (!isOpponent) {
             for (int tank = 0; tank < tankPerSide; tank++)
-                field->nextAction[field->mySide][tank] =
-                    (Action)value[tank].asInt();
+                field->nextAction[field->mySide][tank] = (Action)value[tank].asInt();
         } else {
             for (int tank = 0; tank < tankPerSide; tank++)
-                field->nextAction[1 - field->mySide][tank] =
-                    (Action)value[tank].asInt();
+                field->nextAction[1 - field->mySide][tank] = (Action)value[tank].asInt();
             field->DoAction();
         }
     } else {
         // 是第一回合，裁判在介绍场地
         if (!field || field->shouldInit) {
             int hasBrick[3], hasWater[3], hasSteel[3];
-            for (int i = 0; i < 3; i++) {  // Tank2 feature(?????????????]
+            for (int i = 0; i < 3; i++) {  // Tank2 feature
                 hasWater[i] = value["waterfield"][i].asInt();
                 hasBrick[i] = value["brickfield"][i].asInt();
                 hasSteel[i] = value["steelfield"][i].asInt();
             }
-            field = new TankField(hasBrick, hasWater, hasSteel,
-                                  value["mySide"].asInt());
+            field = new TankField(hasBrick, hasWater, hasSteel, value["mySide"].asInt());
         }
     }
 }
@@ -431,11 +403,7 @@ void _processRequestOrResponse(Json::Value &value, bool isOpponent) {
 }  // namespace TankGame
 namespace TankGame {
 namespace Internals {
-void _submitAction(Action tank0,
-                   Action tank1,
-                   string debug,
-                   string data,
-                   string globalData) {
+void _submitAction(Action tank0, Action tank1, string debug, string data, string globalData) {
     Json::Value output(Json::objectValue), response(Json::arrayValue);
     response[0U] = tank0;
     response[1U] = tank1;
@@ -467,32 +435,24 @@ void ReadInput(istream &in, string &outData, string &outGlobalData) {
     Internals::reader.parse(inputString, input);
 
     if (input.isObject()) {
-        Json::Value requests = input["requests"],
-                    responses = input["responses"];
+        Json::Value requests = input["requests"], responses = input["responses"];
         if (responses.empty() && field) field->shouldInit = true;
         if (!requests.isNull() && requests.isArray()) {
             size_t i, n = requests.size();
             for (i = 0; i < n; i++) {
-                Internals::_processRequestOrResponse(
-                    requests[(Json::Value::UInt)i], true);
-                if (i < n - 1)
-                    Internals::_processRequestOrResponse(
-                        responses[(Json::Value::UInt)i], false);
+                Internals::_processRequestOrResponse(requests[(Json::Value::UInt)i], true);
+                if (i < n - 1) Internals::_processRequestOrResponse(responses[(Json::Value::UInt)i], false);
             }
             outData = input["data"].asString();
             outGlobalData = input["globaldata"].asString();
             return;
         }
     }
-    // Internals::_processRequestOrResponse(input, true); 这行好像永远不会执行的
+    Internals::_processRequestOrResponse(input, true);
 }
 }  // namespace TankGame
 namespace TankGame {
-void SubmitAndExit(Action tank0,
-                   Action tank1,
-                   string debug,
-                   string data,
-                   string globalData) {
+void SubmitAndExit(Action tank0, Action tank1, string debug, string data, string globalData) {
     Internals::_submitAction(tank0, tank1, debug, data, globalData);
     exit(0);
 }
@@ -510,10 +470,8 @@ int RandBetween(int from, int to) { return rand() % (to - from) + from; }
 
 TankGame::Action RandAction(int tank) {
     while (true) {
-        auto act = (TankGame::Action)RandBetween(TankGame::Stay,
-                                                 TankGame::LeftShoot + 1);
-        if (TankGame::field->ActionIsValid(TankGame::field->mySide, tank, act))
-            return act;
+        auto act = (TankGame::Action)RandBetween(TankGame::Stay, TankGame::LeftShoot + 1);
+        if (TankGame::field->ActionIsValid(TankGame::field->mySide, tank, act)) return act;
     }
 }
 

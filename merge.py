@@ -4,7 +4,7 @@ import re
 
 src = ["json/json.h", "json/json-forwards.h", "json/jsoncpp.cpp",
        "src/template.h", "src/template.cpp", 
-       "src/bot.h", "src/bot.cpp", "main.cpp"]
+       "src/rule.h", "src/rule.cpp", "src/bot.h", "src/bot.cpp", "main.cpp"]
 
 lines = []
 for filename in src:

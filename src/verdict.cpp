@@ -33,19 +33,16 @@ bool visited[fieldHeight][fieldWidth];
 /*****************copied from TankField****************/
 int tankX[sideCount][tankPerSide] = {{fieldWidth / 2 - 2, fieldWidth / 2 + 2},
                                      {fieldWidth / 2 + 2, fieldWidth / 2 - 2}};
-int tankY[sideCount][tankPerSide] = {{0, 0},
-                                     {fieldHeight - 1, fieldHeight - 1}};
+int tankY[sideCount][tankPerSide] = {{0, 0}, {fieldHeight - 1, fieldHeight - 1}};
 /*****************************************************/
 
 int dirEnumerateList[][4] = {
-    {Up, Right, Down, Left}, {Up, Right, Left, Down}, {Up, Down, Right, Left},
-    {Up, Down, Left, Right}, {Up, Left, Right, Down}, {Up, Left, Down, Right},
-    {Right, Up, Down, Left}, {Right, Up, Left, Down}, {Right, Down, Up, Left},
-    {Right, Down, Left, Up}, {Right, Left, Up, Down}, {Right, Left, Down, Up},
-    {Down, Up, Right, Left}, {Down, Up, Left, Right}, {Down, Right, Up, Left},
-    {Down, Right, Left, Up}, {Down, Left, Up, Right}, {Down, Left, Right, Up},
-    {Left, Up, Right, Down}, {Left, Up, Down, Right}, {Left, Right, Up, Down},
-    {Left, Right, Down, Up}, {Left, Down, Up, Right}, {Left, Down, Right, Up}};
+    {Up, Right, Down, Left}, {Up, Right, Left, Down}, {Up, Down, Right, Left}, {Up, Down, Left, Right},
+    {Up, Left, Right, Down}, {Up, Left, Down, Right}, {Right, Up, Down, Left}, {Right, Up, Left, Down},
+    {Right, Down, Up, Left}, {Right, Down, Left, Up}, {Right, Left, Up, Down}, {Right, Left, Down, Up},
+    {Down, Up, Right, Left}, {Down, Up, Left, Right}, {Down, Right, Up, Left}, {Down, Right, Left, Up},
+    {Down, Left, Up, Right}, {Down, Left, Right, Up}, {Left, Up, Right, Down}, {Left, Up, Down, Right},
+    {Left, Right, Up, Down}, {Left, Right, Down, Up}, {Left, Down, Up, Right}, {Left, Down, Right, Up}};
 // BFS to ensure that there is only one connected component
 // InitializeField already ensures that water&steel will not appear on base and
 // tank
@@ -55,8 +52,7 @@ struct node {
     node(int xx, int yy) { x = xx, y = yy; }
 };
 std::queue<node> q;
-bool EnsureConnected(bool hasWater[fieldHeight][fieldWidth],
-                     bool hasSteel[fieldHeight][fieldWidth]) {
+bool EnsureConnected(bool hasWater[fieldHeight][fieldWidth], bool hasSteel[fieldHeight][fieldWidth]) {
     int jishu = 0, jishu2 = 0;
     bool vis[fieldHeight][fieldWidth] = {0};
     for (int i = 0; i < fieldHeight; i++)
@@ -71,8 +67,7 @@ bool EnsureConnected(bool hasWater[fieldHeight][fieldWidth],
         for (int i = 0; i < 4; i++) {
             int eks = x + dx[i];
             int wai = y + dy[i];
-            if (CoordValid(eks, wai) && !vis[eks][wai] &&
-                (!(hasWater[eks][wai] || hasSteel[eks][wai]))) {
+            if (CoordValid(eks, wai) && !vis[eks][wai] && (!(hasWater[eks][wai] || hasSteel[eks][wai]))) {
                 q.push(node(eks, wai));
                 vis[eks][wai] = 1;
                 jishu2++;
@@ -94,35 +89,24 @@ void InitializeField() {
         for (int y = 0; y < portionH; y++)
             for (int x = 0; x < fieldWidth; x++) {
                 hasBrick[y][x] = rand() % 3 > 1;  // 1/3 brick
-                if (hasBrick[y][x] == false)
-                    hasWater[y][x] =
-                        rand() % 27 > 22;  // (3/4)*(4/27)= 1/9 water
+                if (hasBrick[y][x] == false) hasWater[y][x] = rand() % 27 > 22;  // (3/4)*(4/27)= 1/9 water
                 if (hasBrick[y][x] == false && hasWater[y][x] == false)
-                    hasSteel[y][x] =
-                        rand() % 23 > 18;  //(3/4)*(23/27)*(4/23)=1/9 steel
+                    hasSteel[y][x] = rand() % 23 > 18;  //(3/4)*(23/27)*(4/23)=1/9 steel
             }
         int bx = baseX[0], by = baseY[0];
-        hasBrick[by + 1][bx + 1] = hasBrick[by + 1][bx - 1] =
-            hasBrick[by][bx + 1] = hasBrick[by][bx - 1] = true;
-        hasWater[by + 1][bx + 1] = hasWater[by + 1][bx - 1] =
-            hasWater[by][bx + 1] = hasWater[by][bx - 1] = false;
-        hasSteel[by + 1][bx + 1] = hasSteel[by + 1][bx - 1] =
-            hasSteel[by][bx + 1] = hasSteel[by][bx - 1] = false;
+        hasBrick[by + 1][bx + 1] = hasBrick[by + 1][bx - 1] = hasBrick[by][bx + 1] = hasBrick[by][bx - 1] = true;
+        hasWater[by + 1][bx + 1] = hasWater[by + 1][bx - 1] = hasWater[by][bx + 1] = hasWater[by][bx - 1] = false;
+        hasSteel[by + 1][bx + 1] = hasSteel[by + 1][bx - 1] = hasSteel[by][bx + 1] = hasSteel[by][bx - 1] = false;
         hasBrick[by + 1][bx] = true;
         hasBrick[by][bx] = hasBrick[by][bx + 2] = hasBrick[by][bx - 2] = false;
-        hasWater[by][bx] = hasWater[by + 1][bx] = hasWater[by][bx + 2] =
-            hasWater[by][bx - 2] = false;
-        hasSteel[by][bx] = hasSteel[by + 1][bx] = hasSteel[by][bx + 2] =
-            hasSteel[by][bx - 2] = false;
+        hasWater[by][bx] = hasWater[by + 1][bx] = hasWater[by][bx + 2] = hasWater[by][bx - 2] = false;
+        hasSteel[by][bx] = hasSteel[by + 1][bx] = hasSteel[by][bx + 2] = hasSteel[by][bx - 2] = false;
         // symmetry
         for (int y = 0; y < portionH; y++)
             for (int x = 0; x < fieldWidth; x++) {
-                hasBrick[fieldHeight - y - 1][fieldWidth - x - 1] =
-                    hasBrick[y][x];
-                hasWater[fieldHeight - y - 1][fieldWidth - x - 1] =
-                    hasWater[y][x];
-                hasSteel[fieldHeight - y - 1][fieldWidth - x - 1] =
-                    hasSteel[y][x];
+                hasBrick[fieldHeight - y - 1][fieldWidth - x - 1] = hasBrick[y][x];
+                hasWater[fieldHeight - y - 1][fieldWidth - x - 1] = hasWater[y][x];
+                hasSteel[fieldHeight - y - 1][fieldWidth - x - 1] = hasSteel[y][x];
             }
         // separate the field into 4 pieces, each with a tank
         for (int y = 2; y < fieldHeight - 2; y++) {
@@ -137,11 +121,9 @@ void InitializeField() {
         }
         for (int side = 0; side < sideCount; side++) {
             for (int tank = 0; tank < tankPerSide; tank++)
-                hasSteel[tankY[side][tank]][tankX[side][tank]] =
-                    hasWater[tankY[side][tank]][tankX[side][tank]] = false;
-            hasSteel[baseY[side]][baseX[side]] =
-                hasWater[baseY[side]][baseX[side]] =
-                    hasBrick[baseY[side]][baseX[side]] = false;
+                hasSteel[tankY[side][tank]][tankX[side][tank]] = hasWater[tankY[side][tank]][tankX[side][tank]] = false;
+            hasSteel[baseY[side]][baseX[side]] = hasWater[baseY[side]][baseX[side]] =
+                hasBrick[baseY[side]][baseX[side]] = false;
         }
         // add steel onto midpoint&midtankpoint
         hasBrick[fieldHeight / 2][fieldWidth / 2] = false;
@@ -150,8 +132,7 @@ void InitializeField() {
 
         for (int tank = 0; tank < tankPerSide; tank++) {
             hasSteel[fieldHeight / 2][tankX[0][tank]] = true;
-            hasWater[fieldHeight / 2][tankX[0][tank]] =
-                hasBrick[fieldHeight / 2][tankX[0][tank]] = false;
+            hasWater[fieldHeight / 2][tankX[0][tank]] = hasBrick[fieldHeight / 2][tankX[0][tank]] = false;
         }
     } while (!EnsureConnected(hasWater, hasSteel));
     for (int i = 0; i < 3; i++)  // 3 row as one number
@@ -180,15 +161,13 @@ void validateImpl() {
         if (TankGame::field) delete TankGame::field;
         std::stack<TankGame::TankField> history;
         TankJudge::InitializeField();
-        TankGame::field = new TankGame::TankField(TankJudge::fieldBinary,
-                                                  TankJudge::waterBinary,
-                                                  TankJudge::steelBinary, 0);
+        TankGame::field =
+            new TankGame::TankField(TankJudge::fieldBinary, TankJudge::waterBinary, TankJudge::steelBinary, 0);
         while (TankGame::field->GetGameResult() == -2) {
             for (int side = 0; side < TankGame::sideCount; side++)
                 for (int tank = 0; tank < TankGame::tankPerSide; tank++)
                     while (true) {
-                        auto act = (TankGame::Action)TankJudge::RandBetween(
-                            TankGame::Stay, TankGame::LeftShoot + 1);
+                        auto act = (TankGame::Action)TankJudge::RandBetween(TankGame::Stay, TankGame::LeftShoot + 1);
                         if (TankGame::field->ActionIsValid(side, tank, act)) {
                             TankGame::field->nextAction[side][tank] = act;
                             break;

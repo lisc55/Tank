@@ -11,21 +11,17 @@ int main(int argc, char **argv) {
     srand((unsigned)time(0));
     TankJudge::InitializeField();
     TankGame::TankField *fieldCur =
-        new TankGame::TankField(TankJudge::fieldBinary, TankJudge::waterBinary,
-                                TankJudge::steelBinary, 0);
+        new TankGame::TankField(TankJudge::fieldBinary, TankJudge::waterBinary, TankJudge::steelBinary, 0);
     TankGame::TankField *fieldBlue =
-        new TankGame::TankField(TankJudge::fieldBinary, TankJudge::waterBinary,
-                                TankJudge::steelBinary, 0);
+        new TankGame::TankField(TankJudge::fieldBinary, TankJudge::waterBinary, TankJudge::steelBinary, 0);
     TankGame::TankField *fieldRed =
-        new TankGame::TankField(TankJudge::fieldBinary, TankJudge::waterBinary,
-                                TankJudge::steelBinary, 1);
+        new TankGame::TankField(TankJudge::fieldBinary, TankJudge::waterBinary, TankJudge::steelBinary, 1);
     // fieldCur->DebugPrint();
     Bot botBlue(*fieldBlue, C1);
     Bot botRed(*fieldRed, C2);
     Policy polBlue = botBlue.GenDecision(1);
     Policy polRed = botRed.GenDecision(1);
-    fprintf(LOG, "%d %d %d %d\n", polBlue.act_0, polBlue.act_1, polRed.act_0,
-            polRed.act_1);
+    fprintf(LOG, "%d %d %d %d\n", polBlue.act_0, polBlue.act_1, polRed.act_0, polRed.act_1);
     fieldCur->nextAction[0][0] = TankGame::Action(polBlue.act_0);
     fieldCur->nextAction[0][1] = TankGame::Action(polBlue.act_1);
     fieldCur->nextAction[1][0] = TankGame::Action(polRed.act_0);
@@ -52,8 +48,7 @@ int main(int argc, char **argv) {
     while (1) {
         Policy polBlue = botBlue.GenDecision(0);
         Policy polRed = botRed.GenDecision(0);
-        fprintf(LOG, "%d %d %d %d\n", polBlue.act_0, polBlue.act_1,
-                polRed.act_0, polRed.act_1);
+        fprintf(LOG, "%d %d %d %d\n", polBlue.act_0, polBlue.act_1, polRed.act_0, polRed.act_1);
         fieldCur->nextAction[0][0] = TankGame::Action(polBlue.act_0);
         fieldCur->nextAction[0][1] = TankGame::Action(polBlue.act_1);
         fieldCur->nextAction[1][0] = TankGame::Action(polRed.act_0);
