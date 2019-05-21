@@ -7,7 +7,7 @@ const double TIME_LIMIT = 0.80;
 
 int main() {
 #ifndef _BOTZONE_ONLINE
-	freopen("in", "r", stdin);
+    freopen("in", "r", stdin);
 #endif
     srand((unsigned)time(0));
     string data, globaldata;
