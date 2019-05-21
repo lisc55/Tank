@@ -19,13 +19,13 @@ int main() {
                 for (int _ = 1; _ <= 5; _++) {
                     printf("%.3lf %.3lf round %d ", i, j, _);
                     int res = system(cmd.c_str());
-                    if (res == 0) {
+                    if (res == 1) {
                         final_res[i] += 2;
                         printf("Result = Blue\n", i, j);
-                    } else if (res == 1) {
+                    } else if (res == 2) {
                         final_res[j] += 2;
                         printf("Result = Red\n", i, j);
-                    } else {
+                    } else if (res == 0){
                         final_res[i]++, final_res[j]++;
                         printf("Result = Draw\n", i, j);
                     }

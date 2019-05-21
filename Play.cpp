@@ -38,12 +38,12 @@ int main(int argc, char **argv) {
             fprintf(LOG, "Blue\n\n");
         else if (res == TankGame::Red)
             fprintf(LOG, "Red\n\n");
-        else
+        else if (res == TankGame::Draw)
             fprintf(LOG, "Draw\n\n");
         delete fieldCur;
         delete fieldBlue;
         delete fieldRed;
-        return res;
+        return res + 1;
     }
     std::pair<Policy, Policy> pol(polBlue, polRed);
     botBlue.Play(pol);
@@ -66,12 +66,12 @@ int main(int argc, char **argv) {
                 fprintf(LOG, "Blue\n\n");
             else if (res == TankGame::Red)
                 fprintf(LOG, "Red\n\n");
-            else
+            else if (res == TankGame::Draw)
                 fprintf(LOG, "Draw\n\n");
             delete fieldCur;
             delete fieldBlue;
             delete fieldRed;
-            return res;
+            return res + 1;
         }
         std::pair<Policy, Policy> pol(polBlue, polRed);
         botBlue.Play(pol);
