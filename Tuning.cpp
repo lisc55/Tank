@@ -17,17 +17,18 @@ int main() {
                              to_string(j);
                 int T = 5;
                 for (int _ = 1; _ <= 5; _++) {
-                    printf("%.3lf %.3lf round %d ", i, j, _);
+                    cout << cmd << endl;
                     int res = system(cmd.c_str());
+                    printf("%d", res);
                     if (res == 1) {
                         final_res[i] += 2;
-                        printf("Result = Blue\n", i, j);
+                        printf("Result = Blue\n");
                     } else if (res == 2) {
                         final_res[j] += 2;
-                        printf("Result = Red\n", i, j);
-                    } else if (res == 0) {
+                        printf("Result = Red\n");
+                    } else if (res == 0){
                         final_res[i]++, final_res[j]++;
-                        printf("Result = Draw\n", i, j);
+                        printf("Result = Draw\n");
                     }
                 }
             }
