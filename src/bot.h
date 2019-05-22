@@ -57,7 +57,7 @@ class Bot {
     TankGame::TankField state;
     // parameter
     const double TIME_LIMIT;
-    const double C, dist_c, rule_c, shoot_c, noteff_shoot_c, self_kill_c;
+    const double C, dist_c, rule_c, shoot_c, noteff_shoot_c, self_kill_c, not_move_c;
     const int rollOut;
     const int TRAIN_UNIT = 100;
 
@@ -69,20 +69,22 @@ class Bot {
 
     Bot(const TankGame::TankField &s,
         double C = 0.9,
-        double dist_c = 0.1,
+        double dist_c = 0.5,
         double rule_c = 0.2,
         double shoot_c = 0.2,
         double noteff_shoot_c = 0.2,
         double self_kill_c = 0.2,
+        double not_move_c = 0.2,
         int rollOut = 5)
         : state(s),
-          TIME_LIMIT(0.9),
+          TIME_LIMIT(0.88),
           C(C),
           dist_c(dist_c),
           rule_c(rule_c),
           shoot_c(shoot_c),
           noteff_shoot_c(noteff_shoot_c),
           self_kill_c(self_kill_c),
+          not_move_c(not_move_c),
           rollOut(rollOut) {
         root = new Node(std::make_pair(Policy(-2, -2), Policy(-2, -2)));
     }
@@ -108,9 +110,13 @@ class Bot {
 
     void Play(const std::pair<Policy, Policy> &);
 
-    std::pair<double, double> Eval(Node *, TankGame::TankField &s);
+    std::pair<double, double> Eval(Node *, TankGame::TankField &);
 
-    std::pair<double, double> Penalty(Node *, TankGame::TankField &s);
+    std::pair<double, double> Penalty(Node *, TankGame::TankField &);
+
+    inline double Sigmoid(double);
+
+    std::pair<double, double> Utility(TankGame::GameResult &);
 };
 
 #endif

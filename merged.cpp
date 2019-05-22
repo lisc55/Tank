@@ -4567,7 +4567,6 @@ class TankField {
     FieldItem gameField[fieldHeight][fieldWidth];
     bool tankAlive[sideCount][tankPerSide] = {{true, true}, {true, true}};
     bool baseAlive[sideCount] = {true, true};
-    bool shouldInit = false;
     int tankX[sideCount][tankPerSide] = {{fieldWidth / 2 - 2, fieldWidth / 2 + 2},
                                          {fieldWidth / 2 + 2, fieldWidth / 2 - 2}};
     int tankY[sideCount][tankPerSide] = {{0, 0}, {fieldHeight - 1, fieldHeight - 1}};
@@ -5101,15 +5100,13 @@ void _processRequestOrResponse(Json::Value &value, bool isOpponent) {
         }
     } else {
         // 是第一回合，裁判在介绍场地
-        if (!field || field->shouldInit) {
-            int hasBrick[3], hasWater[3], hasSteel[3];
-            for (int i = 0; i < 3; i++) {  // Tank2 feature
-                hasWater[i] = value["waterfield"][i].asInt();
-                hasBrick[i] = value["brickfield"][i].asInt();
-                hasSteel[i] = value["steelfield"][i].asInt();
-            }
-            field = new TankField(hasBrick, hasWater, hasSteel, value["mySide"].asInt());
+        int hasBrick[3], hasWater[3], hasSteel[3];
+        for (int i = 0; i < 3; i++) {  // Tank2 feature
+            hasWater[i] = value["waterfield"][i].asInt();
+            hasBrick[i] = value["brickfield"][i].asInt();
+            hasSteel[i] = value["steelfield"][i].asInt();
         }
+        field = new TankField(hasBrick, hasWater, hasSteel, value["mySide"].asInt());
     }
 }
 }  // namespace Internals
@@ -5149,7 +5146,6 @@ void ReadInput(istream &in, string &outData, string &outGlobalData) {
 
     if (input.isObject()) {
         Json::Value requests = input["requests"], responses = input["responses"];
-        if (responses.empty() && field) field->shouldInit = true;
         if (!requests.isNull() && requests.isArray()) {
             size_t i, n = requests.size();
             for (i = 0; i < n; i++) {
@@ -5654,7 +5650,7 @@ class Bot {
     TankGame::TankField state;
     // parameter
     const double TIME_LIMIT;
-    const double C, dist_c, rule_c, shoot_c, noteff_shoot_c, self_kill_c;
+    const double C, dist_c, rule_c, shoot_c, noteff_shoot_c, self_kill_c, not_move_c;
     const int rollOut;
     const int TRAIN_UNIT = 100;
 
@@ -5666,20 +5662,22 @@ class Bot {
 
     Bot(const TankGame::TankField &s,
         double C = 0.9,
-        double dist_c = 0.1,
+        double dist_c = 0.5,
         double rule_c = 0.2,
         double shoot_c = 0.2,
         double noteff_shoot_c = 0.2,
         double self_kill_c = 0.2,
+        double not_move_c = 0.2,
         int rollOut = 5)
         : state(s),
-          TIME_LIMIT(0.9),
+          TIME_LIMIT(0.88),
           C(C),
           dist_c(dist_c),
           rule_c(rule_c),
           shoot_c(shoot_c),
           noteff_shoot_c(noteff_shoot_c),
           self_kill_c(self_kill_c),
+          not_move_c(not_move_c),
           rollOut(rollOut) {
         root = new Node(std::make_pair(Policy(-2, -2), Policy(-2, -2)));
     }
@@ -5705,14 +5703,16 @@ class Bot {
 
     void Play(const std::pair<Policy, Policy> &);
 
-    std::pair<double, double> Eval(Node *, TankGame::TankField &s);
+    std::pair<double, double> Eval(Node *, TankGame::TankField &);
 
-    std::pair<double, double> Penalty(Node *, TankGame::TankField &s);
+    std::pair<double, double> Penalty(Node *, TankGame::TankField &);
+
+    inline double Sigmoid(double);
+
+    std::pair<double, double> Utility(TankGame::GameResult &);
 };
 
 #endif
-
-#include <cassert>
 
 void Print(Node *p) {
     for (auto i : p->ch) {
@@ -5721,6 +5721,8 @@ void Print(Node *p) {
     }
     puts("");
 }
+
+inline double Bot::Sigmoid(double x) { return 1.0 / (1 + exp(-x)); }
 
 std::pair<double, double> Bot::Eval(Node *p, TankGame::TankField &s) {
     double resb, resr;
@@ -5742,12 +5744,16 @@ std::pair<double, double> Bot::Penalty(Node *p, TankGame::TankField &s) {
     double resb = 0, resr = 0;
     // 注意s要返回之前的局面一下
     if (!s.Revert()) return std::make_pair(resb, resr);
+    TankGame::MarkTheField(s);
+    TankGame::DistanceToBase(0, s);
+    TankGame::DistanceToBase(1, s);
     // 向空地、钢铁和队友射击的惩罚
-    short noeff_penalty[2] = {2, 2}, self_kill_penalty[2] = {0};
+    int noeff_penalty[2] = {2, 2}, self_kill_penalty[2] = {0}, not_move[2] = {0};
     // 看看在向什么地方射击
     for (int side = 0; side < TankGame::sideCount; side++)
         for (int tank = 0; tank < TankGame::tankPerSide; tank++) {
             TankGame::Action act = s.previousActions[s.currentTurn][side][tank];
+            if (int(act) == -1) not_move[side]++;
             if (ActionIsShoot(act)) {
                 int dir = ExtractDirectionFromAction(act);
                 int x = s.tankX[side][tank], y = s.tankY[side][tank];
@@ -5765,14 +5771,14 @@ std::pair<double, double> Bot::Penalty(Node *p, TankGame::TankField &s) {
             } else
                 noeff_penalty[side]--;
         }
-    resb -= noeff_penalty[0] * noteff_shoot_c + self_kill_penalty[0] * self_kill_c;
-    resr -= noeff_penalty[1] * noteff_shoot_c + self_kill_penalty[1] * self_kill_c;
+    resb -= noeff_penalty[0] * noteff_shoot_c + self_kill_penalty[0] * self_kill_c + not_move[0] * not_move_c;
+    resr -= noeff_penalty[1] * noteff_shoot_c + self_kill_penalty[1] * self_kill_c + not_move[1] * not_move_c;
 
     // 如果和纯规则的策略一样，给予适当的奖励
     std::pair<int, int> ruleBlue = TankGame::RuleDecision(0, s);
     std::pair<int, int> ruleRed = TankGame::RuleDecision(1, s);
-    if (p->fa->pol.first == Policy(ruleBlue.first, ruleBlue.second)) resb += rule_c;
-    if (p->fa->pol.second == Policy(ruleRed.first, ruleRed.second)) resb += rule_c;
+    if (p->pol.first == Policy(ruleBlue.first, ruleBlue.second)) resb += rule_c;
+    if (p->pol.second == Policy(ruleRed.first, ruleRed.second)) resr += rule_c;
     return std::make_pair(resb, resr);
 }
 
@@ -5862,22 +5868,50 @@ Node *Bot::RandomMove(Node *p) {
     return nullptr;
 }
 
+std::pair<double, double> Bot::Utility(TankGame::GameResult &g) {
+    switch (g) {
+        case TankGame::Draw:
+            return std::make_pair(0.5, 0.5);
+        case TankGame::Blue:
+            return std::make_pair(1.0, 0.0);
+        case TankGame::Red:
+            return std::make_pair(0.0, 1.0);
+    }
+}
+
 // roll-out
 void Bot::RollOut(Node *p) {
     Node *ch;
+    // orginal
+    /*
+    for (Node *t = p;; t = ch, Move(t->pol)) {
+        ch = RandomMove(t);
+        TankGame::GameResult res = state.GetGameResult();
+        if (res != TankGame::NotFinished) {
+            if (!p->ch.empty()) {
+                delete p->ch.begin()->second;
+                p->full = 0;
+                p->ch.clear();
+            }
+            BackPropagation(p, Utility(res));
+            return;
+        }
+    }
+    */
     int count = 0;
     std::pair<double, double> pen = Penalty(p, state);
     Move(p->pol);
     for (Node *t = p;; t = ch, Move(t->pol)) {
         ch = RandomMove(t);
+        if (state.GetGameResult() != TankGame::NotFinished) break;
         if (++count > rollOut) break;
     }
+    std::pair<double, double> eva = Eval(ch, state);
     if (!p->ch.empty()) {
         delete p->ch.begin()->second;
         p->full = 0;
         p->ch.clear();
     }
-    std::pair<double, double> eva = Eval(p, state);
     eva.first += pen.first;
     eva.second += pen.second;
     BackPropagation(p, eva);
@@ -5915,7 +5949,7 @@ void Bot::Update(Node *p) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
             if (vis[i][j][0]) {
-                tmp = val[i][j][0] / vis[i][j][0] +  // Expectaion
+                tmp = Sigmoid(val[i][j][0]) / vis[i][j][0] +  // Expectaion
                       C * sqrt(log(p->vis) / vis[i][j][0]);  // UCB length
                 if (tmp > mx) {
                     mx = tmp;
@@ -5930,7 +5964,7 @@ void Bot::Update(Node *p) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
             if (vis[i][j][1]) {
-                tmp = val[i][j][1] / vis[i][j][1] +  // Expectaion
+                tmp = Sigmoid(val[i][j][1]) / vis[i][j][1] +  // Expectaion
                       C * sqrt(log(p->vis) / vis[i][j][1]);  // UCB length
                 if (tmp > mx) {
                     mx = tmp;
@@ -5983,7 +6017,7 @@ Policy Bot::GenDecision(bool first) {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (vis[i][j][1])
-                    val[i][j][0] = val[i][j][1] / vis[i][j][1];
+                    val[i][j][0] = Sigmoid(val[i][j][1]) / vis[i][j][1];
                 else
                     val[i][j][0] = 0;
             }
@@ -5996,7 +6030,7 @@ Policy Bot::GenDecision(bool first) {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 if (vis[i][j][0])
-                    val[i][j][0] = val[i][j][0] / vis[i][j][0];
+                    val[i][j][0] = Sigmoid(val[i][j][0]) / vis[i][j][0];
                 else
                     val[i][j][0] = 0;
             }
@@ -6006,7 +6040,7 @@ Policy Bot::GenDecision(bool first) {
     //     for (int j = 0; j < 9; j++) { printf("%.2lf ", val[i][j][0]); }
     //     puts("");
     // }
-    double max = 0;
+    double max = -1;
     int act_0 = -1, act_1 = -1;
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
@@ -6031,10 +6065,6 @@ void Bot::Play(const std::pair<Policy, Policy> &pol) {
 using namespace TankGame;
 
 int main() {
-#define _BOTZONE_ONLINE
-#ifndef _BOTZONE_ONLINE
-    freopen("in", "r", stdin);
-#endif
     srand((unsigned)time(0));
     string data, globaldata;
     ReadInput(std::cin, data, globaldata);

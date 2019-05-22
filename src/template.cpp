@@ -388,15 +388,13 @@ void _processRequestOrResponse(Json::Value &value, bool isOpponent) {
         }
     } else {
         // 是第一回合，裁判在介绍场地
-        if (!field || field->shouldInit) {
-            int hasBrick[3], hasWater[3], hasSteel[3];
-            for (int i = 0; i < 3; i++) {  // Tank2 feature
-                hasWater[i] = value["waterfield"][i].asInt();
-                hasBrick[i] = value["brickfield"][i].asInt();
-                hasSteel[i] = value["steelfield"][i].asInt();
-            }
-            field = new TankField(hasBrick, hasWater, hasSteel, value["mySide"].asInt());
+        int hasBrick[3], hasWater[3], hasSteel[3];
+        for (int i = 0; i < 3; i++) {  // Tank2 feature
+            hasWater[i] = value["waterfield"][i].asInt();
+            hasBrick[i] = value["brickfield"][i].asInt();
+            hasSteel[i] = value["steelfield"][i].asInt();
         }
+        field = new TankField(hasBrick, hasWater, hasSteel, value["mySide"].asInt());
     }
 }
 }  // namespace Internals
@@ -436,7 +434,6 @@ void ReadInput(istream &in, string &outData, string &outGlobalData) {
 
     if (input.isObject()) {
         Json::Value requests = input["requests"], responses = input["responses"];
-        if (responses.empty() && field) field->shouldInit = true;
         if (!requests.isNull() && requests.isArray()) {
             size_t i, n = requests.size();
             for (i = 0; i < n; i++) {
